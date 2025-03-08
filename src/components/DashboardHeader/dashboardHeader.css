@@ -1,0 +1,48 @@
+.dashboard-header {
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    height: 80px;
+    background-color: white;
+    padding: 20px;
+  }
+  .online{
+    position: absolute;
+    width: 14px;
+    background-color: rgb(25, 230, 25);
+    border: 2px solid white;
+    height: 14px;
+    border-radius: 50%;
+    top: 18px;
+    right: 175px;
+  }
+  .notification{
+    font-size: 2rem;
+    color: #878787;
+    position: absolute;
+    left: 75%;
+  }
+  .notification-online{
+    position: absolute;
+    width: 14px;
+    background-color: #f23985;
+    border: 2px solid white;
+    height: 14px;
+    border-radius: 50%;
+    right: 22.5%;
+    top: 28px;
+    z-index: 1;
+  }
+  
+  .profile-section {
+    display: flex;
+    align-items: center;
+  }
+  
+  .profile-section .profile-pic {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+  }
+  

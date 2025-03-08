@@ -13,7 +13,7 @@ const Login = () => {
         <label>Password</label>
         <input className='user-input' />
         <button style={{ backgroundColor: "transparent", border: "none" }} onClick={()=>{navigate('/forgot-password')}}>Forgot Password ?</button>
-        <button className='btn btn-dark my-3' style={{ width: "100%" }}>Continue</button>
+        <button className='btn btn-dark my-3' style={{ width: "100%" }} onClick={()=>{navigate('/dashboard')}}>Continue</button>
         <div className='fs-5 fw-semibold'>or</div>
         <button className="btn my-2" style={{ border: "1px solid #bdbdbd", width: "100%", backgroundColor: "white", color: "#bdbdbd", fontSize: "14px" }} >SignUp with Google</button>
         <button className="btn my-2" style={{ border: "1px solid #bdbdbd", width: "100%", backgroundColor: "white", color: "#bdbdbd", fontSize: "14px" }}>SignUp with Facebook</button>
