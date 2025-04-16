@@ -14,13 +14,14 @@
     height: 14px;
     border-radius: 50%;
     top: 18px;
-    right: 175px;
+    right: 255px;
   }
   .notification{
     font-size: 2rem;
     color: #878787;
     position: absolute;
-    left: 75%;
+    left: 70%;
+    top:28px;
   }
   .notification-online{
     position: absolute;
@@ -29,7 +30,7 @@
     border: 2px solid white;
     height: 14px;
     border-radius: 50%;
-    right: 22.5%;
+    right: 27.5%;
     top: 28px;
     z-index: 1;
   }
