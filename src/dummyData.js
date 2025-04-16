@@ -3,10 +3,10 @@ import { MdDescription } from "react-icons/md";
 
 
 export const matchesList = [
-  { team:"Strikes",city: "Lahore",venue:"FAST",date:"15/2/25",time:"10:00",format:"T20",matchNumber:"001" },
-  { team:"Strikes",city: "Lahore",venue:"FAST",date:"15/2/25",time:"10:00",format:"T20",matchNumber:"001" },
-  { team:"Strikes",city: "Lahore",venue:"FAST",date:"15/2/25",time:"10:00",format:"T20",matchNumber:"001" },
-  { team:"Strikes",city: "Lahore",venue:"FAST",date:"15/2/25",time:"10:00",format:"T20",matchNumber:"001" },
+  { team:"Strikes",city: "Lahore",venue:"FAST",date:"15/2/25",time:"10:00",format:"T20",matchNumber:"001",matchType:"Tournament" },
+  { team:"Strikes",city: "Lahore",venue:"FAST",date:"15/2/25",time:"10:00",format:"T20",matchNumber:"001",matchType:"Tournament" },
+  { team:"Strikes",city: "Lahore",venue:"FAST",date:"15/2/25",time:"10:00",format:"T20",matchNumber:"001",matchType:"Tournament" },
+  { team:"Strikes",city: "Lahore",venue:"FAST",date:"15/2/25",time:"10:00",format:"T20",matchNumber:"001",matchType:"Tournament" },
 
   // Add more entries as needed
 ];

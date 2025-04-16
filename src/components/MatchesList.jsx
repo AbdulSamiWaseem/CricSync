@@ -2,12 +2,12 @@ import React from 'react'
 import Box from '@mui/material/Box';
 import { DataGrid } from '@mui/x-data-grid';
 import { matchesList } from '../dummyData';
-const MachesList = () => {
+const MatchesList = () => {
   const columns = [
     {
       field: 'team',
       headerName: 'Team',
-      width: 150
+      width: 140
     },
     {
       field: 'city',
@@ -17,24 +17,30 @@ const MachesList = () => {
     {
       field: 'venue',
       headerName: 'Venue',
-      width: 150,
+      width: 110,
     },
     {
       field: 'date',
       headerName: 'Date',
-      width: 150,
+      width: 120,
     },
     {
       field: 'time',
       headerName: 'Time',
-      width: 110,
+      width: 100,
     },
     {
       field: 'format',
       headerName: 'Format',
       type: 'number',
-      width: 160,
+      width: 100,
     },
+    {
+      field: 'matchType',
+      headerName: 'Match Type',
+      width: 150,
+    },
+
     {
       field: 'action',
       headerName: 'Action',
@@ -57,7 +63,7 @@ const MachesList = () => {
       borderRadius: "20px",
       width: "100%",
     }}>
-      <h4 style={{ color: "#374957" }}>Properties List</h4>
+      <h4 style={{ color: "#374957" }}>Matches List</h4>
       <Box sx={{ height: 400, width: '100%' }}>
         <DataGrid
           rows={matchesList}
@@ -79,4 +85,4 @@ const MachesList = () => {
   )
 }
 
-export default MachesList
+export default MatchesList

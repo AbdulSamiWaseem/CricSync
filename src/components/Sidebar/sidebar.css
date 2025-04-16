@@ -64,3 +64,6 @@ li>svg {
 .accordion-body {
   padding: 0 20px;
 }
+.sidebar::-webkit-scrollbar {
+  display: none; /* For Chrome, Safari, and Opera */
+}

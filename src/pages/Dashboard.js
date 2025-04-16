@@ -12,7 +12,7 @@ const Dashboard = () => {
     return (
         <DashboardHeader>
             <Sidebar>
-                <div style={{ padding: "20px", width: "80%",marginLeft:"20%",backgroundColor:"#f0f0f0",height:"100vh"}} >
+                <div style={{ padding: "20px", width: "100%",backgroundColor:"#f0f0f0",height:"100vh"}} >
                     <h1 style={{ fontWeight: "700", color: "#374957" }}>Dashboard</h1>
                     <p style={{ color: "#1bcfb4" }}>Welcome back, Farhan</p>
                     <div style={{ display: "grid", gap: "20px", gridTemplateColumns: "repeat(auto-fill, minmax(22%, 1fr))", marginBottom: "20px" }}>
