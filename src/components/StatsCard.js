@@ -11,7 +11,7 @@ const StatsCard = ({ title, count, icon, color1, color2 }) => {
       alignItems: "center",
       boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
       background: `linear-gradient(to right, ${color1}, ${color2})`,
-    }}>
+    }} >
       <div style={{ display: "flex", alignItems: "center" }}>
         <div>
           <h5>{title}</h5>
@@ -27,7 +27,7 @@ const StatsCard = ({ title, count, icon, color1, color2 }) => {
           marginLeft: "10px",
           padding: "10px",
         }}>
-          <img src={icon} style={{width:"40px"}}></img>
+          <img src={icon} style={{ width: "40px" }}></img>
         </div>
       </div>
     </div>
