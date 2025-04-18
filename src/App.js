@@ -18,6 +18,7 @@ import Settings from './pages/settings';
 import TeamProfile from './pages/teamProfile';
 import TournamentSetup from './pages/tournamentSetup';
 import FollowingTeams from './pages/followingTeams';
+import MatchesHistory from './pages/MatchesHistory';
 
 
 function App() {
@@ -31,7 +32,8 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path='/matches/list' element={<MatchList />} />
-          <Route path='/matches/my-matches' element={<MyMatches />} />
+          <Route path='/matches/upcoming-matches' element={<MyMatches />} />
+          <Route path='/matches/matches-history' element={<MatchesHistory />} />
           <Route path='/tournament/list' element={<TournamentList />} />
           <Route path='/tournament/my-tournaments' element={<MyTournament />} />
           <Route path='/teams/list' element={<TeamsList />} />
