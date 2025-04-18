@@ -13,6 +13,13 @@ import TournamentList from './pages/TournamentList';
 import MyTournament from './pages/MyTournament';
 import TeamsList from './pages/TeamsList';
 import NotificationPage from './pages/NotificationPage';
+import MatchSetup from './pages/matchSetup';
+import Settings from './pages/settings';
+import TeamProfile from './pages/teamProfile';
+import TournamentSetup from './pages/tournamentSetup';
+import FollowingTeams from './pages/followingTeams';
+
+
 function App() {
   return (
     <div className="App">
@@ -29,7 +36,11 @@ function App() {
           <Route path='/tournament/my-tournaments' element={<MyTournament />} />
           <Route path='/teams/list' element={<TeamsList />} />
           <Route path='/notifications' element={<NotificationPage />} />
-
+          <Route path='/matches/match-setup' element={<MatchSetup />} />
+          <Route path='/settings' element={<Settings />} />
+          <Route path='/team-profile' element={< TeamProfile />} />
+          <Route path='/tournament/tournament-setup' element={< TournamentSetup />} />
+          <Route path='/teams/following-teams' element={< FollowingTeams />} />
 
 
 

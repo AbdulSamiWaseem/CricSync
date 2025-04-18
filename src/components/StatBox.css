@@ -1,0 +1,30 @@
+.stat-box {
+    width: 200px;
+    border-radius: 8px;
+    padding: 0px 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    margin: 0 50px;
+  }
+  
+  .stat-title {
+    padding: 10px;
+    color: white;
+    font-weight: bold;
+    border-radius: 6px 6px 0 0;
+    margin: -10px -10px 10px -10px;
+  }
+  
+  .stat-values .stat-item {
+    margin-bottom: 8px;
+  }
+  
+  .stat-value {
+    font-size: 22px;
+    font-weight: bold;
+  }
+  
+  .stat-label {
+    font-size: 14px;
+  }
+  
