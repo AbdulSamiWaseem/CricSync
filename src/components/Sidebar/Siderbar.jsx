@@ -19,7 +19,7 @@ const Sidebar = ({ children }) => {
           top: 0,
           left: 0,
           height: "100vh",
-          width: "250px",
+          width: "255px",
           overflowY: "auto",
           backgroundColor: "#fff", // optional: background for clarity
           zIndex: 1000,
@@ -51,7 +51,8 @@ const Sidebar = ({ children }) => {
               <div id="collapseMatches" className="accordion-collapse collapse show">
                 <div className="accordion-body">
                   <Link to="/matches/list" style={{ textDecoration: 'none' }}><li><FaRegCircle /> List</li></Link>
-                  <Link to="/matches/my-matches" style={{ textDecoration: 'none' }}><li><FaRegCircle /> My Matches</li></Link>
+                  <Link to="/matches/upcoming-matches" style={{ textDecoration: 'none' }}><li><FaRegCircle /> Upcoming Matches</li></Link>
+                  <Link to="/matches/matches-history" style={{ textDecoration: 'none' }}><li><FaRegCircle /> Matches History</li></Link>
                   <Link to="/matches/match-setup" style={{ textDecoration: 'none' }}><li><FaRegCircle /> Match Setup</li></Link>
                 </div>
               </div>
