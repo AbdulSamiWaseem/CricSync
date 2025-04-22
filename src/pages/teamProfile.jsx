@@ -1,25 +1,44 @@
 import React from 'react';
 import './teamProfile.css';
+import { useParams } from 'react-router-dom';
 import DashboardHeader from '../components/DashboardHeader/DashboardHeader';
 import Sidebar from '../components/Sidebar/Siderbar';
 
 const TeamProfile = () => {
-  const teamName = 'FAST';
-  const teamLogo = '/fast-logo.png';
-  const totalMatches = 10;
-  const wins = 6;
-  const losses = 4;
+  const { teamId } = useParams();
 
-  const matchHistory = [
-    'Won Against BNU',
-    'Lost Against FCCU',
-    'Won Against UVAS',
-    'Won Against UCP',
-    'Lost Against BNU',
-    'Won Against UMT',
-    'Won Against BNU',
-    'Won Against BNU',
-  ];
+  const teamData = {
+    fast: {
+      teamName: 'FAST',
+      teamLogo: '/fast-logo.png',
+      totalMatches: 10,
+      wins: 6,
+      losses: 4,
+      matchHistory: ['Won Against BNU', 'Lost Against FCCU', 'Won Against UVAS'],
+    },
+    vcc: {
+      teamName: 'V.C.C.',
+      teamLogo: '/VCC-logo.png',
+      totalMatches: 8,
+      wins: 5,
+      losses: 3,
+      matchHistory: ['Won Against UCP', 'Lost Against UET', 'Won Against COMSATS'],
+    },
+    lcc: {
+      teamName: 'LCC',
+      teamLogo: '/LCC-logo.png',
+      totalMatches: 7,
+      wins: 4,
+      losses: 3,
+      matchHistory: ['Lost Against FAST', 'Won Against UCP', 'Lost Against NUST'],
+    },
+  };
+
+  const team = teamData[teamId];
+
+  if (!team) return <div>Team not found</div>;
+
+  const { teamName, teamLogo, totalMatches, wins, losses, matchHistory } = team;
 
   return (
     <DashboardHeader>

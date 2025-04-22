@@ -38,13 +38,9 @@ function App() {
           <Route path='/notifications' element={<NotificationPage />} />
           <Route path='/matches/match-setup' element={<MatchSetup />} />
           <Route path='/settings' element={<Settings />} />
-          <Route path='/team-profile' element={< TeamProfile />} />
           <Route path='/tournament/tournament-setup' element={< TournamentSetup />} />
-          <Route path='/teams/following-teams' element={< FollowingTeams />} />
-
-
-
-
+          <Route path="/team/:teamId" element={<TeamProfile />} />
+          <Route path="/teams/following-teams" element={<FollowingTeams />} />
         </Routes>
       </BrowserRouter>
     </div>
