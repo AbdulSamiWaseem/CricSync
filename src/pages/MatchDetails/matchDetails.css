@@ -1,0 +1,60 @@
+.match-detail {
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin: 20px auto;
+    max-width: 800px;
+  }
+  
+  .match-header {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+  
+  .match-status {
+    margin-top: 15px;
+    font-size: 18px;
+  }
+  
+  .status-btn {
+    padding: 10px 20px;
+    margin-right: 10px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .status-btn.win {
+    background-color: #4CAF50;
+    color: white;
+  }
+  
+  .status-btn.loss {
+    background-color: #f44336;
+    color: white;
+  }
+  
+  .chat-btn {
+    margin-top: 20px;
+    padding: 12px 20px;
+    font-size: 16px;
+    background-color: #25D366;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .chat-btn:hover {
+    background-color: #128C7E;
+  }
+  
+  .match-details {
+    font-size: 16px;
+    line-height: 1.6;
+    margin-top: 20px;
+  }
+  

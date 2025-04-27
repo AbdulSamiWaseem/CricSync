@@ -1,0 +1,177 @@
+.match-list {
+    margin: 20px;
+}
+
+.match-history-search-section {
+    background-color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 20px;
+    margin: 20px 0;
+    padding: 10px;
+}
+
+.search-section-a {
+    display: flex;
+}
+
+.search-section-a>div {
+    margin-right: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
+
+
+.search-section-a>div>select {
+    background-color: #9747ff;
+    margin: 0 20px;
+    color: white;
+    border-radius: 50%;
+    font-size: 1rem;
+
+}
+
+
+.search-section-b {
+    background-color: white;
+    border: 1px solid #9747ff;
+    color: black !important;
+    display: flex;
+    border-radius: 20px;
+    font-size: 1rem;
+    justify-content: space-between;
+}
+
+.search-section-b>input {
+    border: none;
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+    padding: 0 10px;
+}
+
+.search-section-b>button {
+    all: unset;
+    background-color: #9747ff;
+    color: white;
+    border-top-right-radius: 18px;
+    border-bottom-right-radius: 18px;
+    padding: 0 10px;
+    font-size: 1.25rem;
+}
+
+.search-section-b>button>svg {
+    font-weight: bold !important;
+}
+/* Match Item Styling */
+.match-item {
+    background-color: #ffffff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease-in-out;
+    cursor: pointer;
+    overflow: hidden;
+  }
+  
+  .match-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .match-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  
+  .match-format {
+    font-size: 14px;
+    font-weight: bold;
+    color: #9747ff; /* Using the requested color */
+    background-color: rgba(151, 71, 255, 0.1);
+    padding: 4px 8px;
+    border-radius: 20px;
+  }
+  
+  .match-result {
+    font-size: 14px;
+    font-weight: bold;
+    padding: 6px 12px;
+    border-radius: 20px;
+    color: #fff;
+    text-align: center;
+    background-color: #007bff;
+    transition: background-color 0.3s ease;
+  }
+  
+  /* Match result color based on outcome */
+  .match-result.won {
+    background-color: #28a745;
+  }
+  
+  .match-result.lost {
+    background-color: #dc3545;
+  }
+  
+  .match-result.draw {
+    background-color: #ffc107;
+  }
+  
+  .match-details {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 10px;
+  }
+  
+  .match-details div {
+    margin-bottom: 6px;
+  }
+  
+  .match-venue, .match-location, .match-time {
+    font-weight: 600;
+  }
+  
+  .match-history {
+    background-color: #f7f7f7;
+    padding: 12px;
+    border-radius: 8px;
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .history-item {
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 8px;
+  }
+  
+  .history-item strong {
+    color: #9747ff; /* Using the requested color */
+  }
+  
+  /* Hover effect on History Items */
+  .history-item:hover {
+    color: #9747ff;
+    cursor: pointer;
+  }
+  
+  /* Responsive Styles for Smaller Screens */
+  @media (max-width: 768px) {
+    .match-item {
+      padding: 12px;
+    }
+  
+    .match-details, .match-history {
+      font-size: 13px;
+    }
+  
+    .match-format {
+      font-size: 12px;
+    }
+  }
+  

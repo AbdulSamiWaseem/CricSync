@@ -1,0 +1,38 @@
+.teams-list {
+    padding: 20px;
+  }
+  
+  .teams-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  
+  .team-item {
+    width: 200px;
+    cursor: pointer;
+    background-color: white;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.2s ease;
+  }
+  
+  .team-item:hover {
+    transform: scale(1.05);
+  }
+  
+  .team-logo {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+  
+  .team-name {
+    font-weight: bold;
+    margin-top: 10px;
+    font-size: 16px;
+  }
+  

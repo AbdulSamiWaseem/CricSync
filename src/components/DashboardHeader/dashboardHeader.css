@@ -1,49 +1,65 @@
 .dashboard-header {
-    display: flex;
-    justify-content: end;
-    align-items: center;
-    height: 80px;
-    background-color: white;
-    padding: 20px;
-  }
-  .online{
-    position: absolute;
-    width: 14px;
-    background-color: rgb(25, 230, 25);
-    border: 2px solid white;
-    height: 14px;
-    border-radius: 50%;
-    top: 18px;
-    right: 255px;
-  }
-  .notification{
-    font-size: 2rem;
-    color: #878787;
-    position: absolute;
-    left: 70%;
-    top:28px;
-  }
-  .notification-online{
-    position: absolute;
-    width: 14px;
-    background-color: #f23985;
-    border: 2px solid white;
-    height: 14px;
-    border-radius: 50%;
-    right: 27.5%;
-    top: 28px;
-    z-index: 1;
-  }
-  
-  .profile-section {
-    display: flex;
-    align-items: center;
-  }
-  
-  .profile-section .profile-pic {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    margin-right: 10px;
-  }
-  
+  display: flex;
+  justify-content: end;
+  align-items: center;
+  height: 80px;
+  background-color: white;
+  padding: 20px;
+}
+
+.notification {
+  font-size: 2rem;
+  color: #878787;
+  position: absolute;
+  left: 74%;
+  top: 28px;
+}
+
+.notification-online {
+  position: absolute;
+  width: 14px;
+  background-color: #f23985;
+  border: 2px solid white;
+  height: 14px;
+  border-radius: 50%;
+  right: 23.65%;
+  top: 28px;
+  z-index: 1;
+}
+
+
+
+.profile-section {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.team-info {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  gap: 10px;
+  color: inherit;
+}
+
+.team-logo {
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
+
+  /* object-fit: contain; */
+  border-radius: 50%;
+  border: 2px solid #9747ff;
+  /* background-color: white; */
+}
+
+.team-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+.logout{
+  margin: 0px 20px !important;
+  padding: 10px !important;
+}

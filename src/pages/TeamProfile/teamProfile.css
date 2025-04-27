@@ -1,0 +1,139 @@
+.team-profile {
+  padding: 20px;
+  width: 100%;
+  background-color: #f0f0f0;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.team-profile-section {
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 20px;
+  height: 100%;
+  padding: 30px 20px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.team-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.team-name {
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.team-logo-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.team-logo {
+  height: 60px;
+}
+
+.follow-btn-wrapper {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.follow-btn {
+  background-color: #d9d9d9;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.team-stats {
+  display: flex;
+  gap: 20px;
+}
+
+.stat-box {
+
+  min-width: 120px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+}
+
+.stat-bar {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 16px;
+  width: 100%;
+}
+
+.stat-value {
+  padding: 25px 0;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.blue-bar {
+  background-color: #35667b;
+}
+
+.green-bar {
+  background-color: #468b6d;
+}
+
+.red-bar {
+  background-color: #903d3d;
+}
+
+.blue-body {
+  background-color: #a8e6f1;
+}
+
+.green-body {
+  background-color: #a6e9c9;
+}
+
+.red-body {
+  background-color: #f2aaaa;
+}
+
+
+.history-section {
+  width: 100%;
+  max-width: 100%;
+  margin-top: 20px;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+
+.history-header {
+  background-color: #c5fdf5;
+  font-weight: 600;
+  text-align: center;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+.history-item {
+  background-color: #e0e0e0;
+  padding: 5px;
+  border-radius: 4px;
+  margin-bottom: 5px;
+  word-wrap: break-word;
+}
+
