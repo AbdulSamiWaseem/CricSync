@@ -1,33 +1,47 @@
-import React, { useState } from 'react'
-import UserAuth from '../../components/UserAuth/UserAuth'
-import { useNavigate } from 'react-router-dom'
-import axios from 'axios'
-import './Login.css'
+import React, { useState } from 'react';
+import UserAuth from '../../components/UserAuth/UserAuth';
+import { useNavigate } from 'react-router-dom';
+import api from '../../utils/api';
+import { useAuth } from '../../context/AuthContext';
+import './Login.css';
+import { useEffect } from 'react';
+
+
 
 const Login = () => {
   const navigate = useNavigate();
-
+  const { login,user } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
 
+  useEffect(() => {
+    if (user) {
+      navigate('/dashboard');
+    }
+  }, [user, navigate]);
+
   const handleLogin = async () => {
     try {
-      const response = await axios.post('http://127.0.0.1:8000/api/token/', {
+      const response = await api.post('login/', {
         email: email,
         password: password,
       });
 
       const { access, refresh } = response.data;
 
-      // Store tokens in localStorage (or use context/store if preferred)
       localStorage.setItem('access_token', access);
       localStorage.setItem('refresh_token', refresh);
 
-      // Navigate to dashboard
+      login({ accessToken: access });
+
       navigate('/dashboard');
     } catch (error) {
-      setErrorMsg('Invalid email or password');
+      if (error.response && error.response.data && error.response.data.detail) {
+        setErrorMsg(error.response.data.detail);
+      } else {
+        setErrorMsg('Invalid email or password');
+      }
       console.error(error);
     }
   };
@@ -46,7 +60,7 @@ const Login = () => {
 
         {errorMsg && <div className="text-danger mt-2">{errorMsg}</div>}
 
-        <button style={{ backgroundColor: "transparent", border: "none" }} onClick={() => navigate('/forgot-password')}>Forgot Password ?</button>
+        <button style={{ backgroundColor: "transparent", border: "none" }} onClick={() => navigate('/forgot-password')}>Forgot Password?</button>
 
         <button className='btn btn-dark my-3' style={{ width: "100%" }} onClick={handleLogin}>Continue</button>
 
@@ -56,7 +70,6 @@ const Login = () => {
           <span className="line"></span>
         </div>
 
-        
         <button className="btn my-2 social-button" style={{ ...socialBtnStyle }}>
           <img src="/google-logo.png" alt="Google Logo" className="social-logo" />
           Sign up with Google
@@ -72,13 +85,14 @@ const Login = () => {
           Sign up with Apple
         </button>
 
-        <p style={{ marginLeft: "90px", marginTop: "20px" }}>New Here?
+        <p style={{ marginLeft: "90px", marginTop: "20px" }}>
+          New Here?
           <button style={{ backgroundColor: "transparent", border: "none", marginLeft: "5px", textDecoration: "underline" }} className='fw-semibold' onClick={() => navigate('/signup')}>SIGN UP HERE</button>
         </p>
       </div>
     </UserAuth>
-  )
-}
+  );
+};
 
 const socialBtnStyle = {
   display: "flex",
@@ -90,6 +104,6 @@ const socialBtnStyle = {
   color: "#bdbdbd",
   fontSize: "14px",
   gap: "20px"
-}
+};
 
 export default Login;

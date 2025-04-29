@@ -2,10 +2,12 @@ import React, { useEffect, useState } from 'react';
 import './dashboardHeader.css';
 import { IoMdNotificationsOutline } from "react-icons/io";
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import Logo from '../../assets/logo.png'
+import api from '../../utils/api';
+import Logo from '../../assets/logo.png';
+import { useAuth } from "../../context/AuthContext";
 
 const DashboardHeader = ({ children }) => {
+  const { logout } = useAuth();
   const [userData, setUserData] = useState({
     teamName: '',
     teamLogo: '',
@@ -19,7 +21,7 @@ const DashboardHeader = ({ children }) => {
 
   const fetchUserProfile = async () => {
     try {
-      const res = await axios.get('http://localhost:8000/api/user/profile/', { withCredentials: true });
+      const res = await api.get('/user/profile/');
       setUserData({
         teamName: res.data.team_name || 'My Team',
         teamLogo: res.data.team_logo || '/default-logo.png',
@@ -29,14 +31,9 @@ const DashboardHeader = ({ children }) => {
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      await axios.post('http://localhost:8000/api/user/logout/', {}, { withCredentials: true });
-      localStorage.removeItem('token');
-      navigate('/login');
-    } catch (error) {
-      console.error('Logout failed', error);
-    }
+  const handleLogout = () => {
+    logout();  
+    navigate("/login"); 
   };
 
   return (
@@ -50,10 +47,8 @@ const DashboardHeader = ({ children }) => {
 
         <div className="profile-section">
           <Link to="/team-profile" className="team-info">
-            {/* <img src={userData.teamLogo} alt="Team Logo" className="team-logo" />
-            <span className="team-name">{userData.teamName}</span> */}
-            <img src={Logo} alt="Team Logo" className="team-logo" />
-            <span className="team-name">FAST XI</span>
+            <img src={userData.teamLogo || Logo} alt="Team Logo" className="team-logo" />
+            <span className="team-name">{userData.teamName || 'FAST XI'}</span>
           </Link>
         </div>
 

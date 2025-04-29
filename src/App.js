@@ -20,42 +20,45 @@ import TournamentSetup from './pages/TournamentSetup/tournamentSetup';
 import FollowingTeams from './pages/FollowingTeams/followingTeams';
 import MatchesHistory from './pages/MatchesHistory/MatchesHistory';
 import ManageCities from './pages/ManageCities';
-import ManageFormats from './pages/ManageFormats'; 
+import ManageFormats from './pages/ManageFormats';
 import ManageLocations from './pages/ManageLocations';
 import TeamsProfile from './pages/TeamsProfile/TeamsProfile';
 import MatchDetails from './pages/MatchDetails/MatchDetails';
-
+import { AuthProvider } from './context/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute'
 function App() {
   return (
     <div className="App">
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Start />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path='/matches/list' element={<MatchList />} />
-          <Route path='/matches/upcoming-matches' element={<MyMatches />} />
-          <Route path='/matches/matches-history' element={<MatchesHistory />} />
-          <Route path='/tournament/list' element={<TournamentList />} />
-          <Route path='/tournament/my-tournaments' element={<MyTournament />} />
-          <Route path='/teams/list' element={<TeamsList />} />
-          <Route path='/notifications' element={<NotificationPage />} />
-          <Route path='/matches/match-setup' element={<MatchSetup />} />
-          <Route path='/settings' element={<Settings />} />
-          <Route path='/tournament/tournament-setup' element={< TournamentSetup />} />
-          <Route path="/team/:teamId" element={<TeamProfile />} />
-          <Route path="/teams/following-teams" element={<FollowingTeams />} />
-          <Route path='/teams/following-teams' element={< FollowingTeams />} />
-          <Route path="/manage-cities" element={<ManageCities />} />
-          <Route path="/manage-formats" element={<ManageFormats />} />
-          <Route path="/manage-locations" element={<ManageLocations />} />
-          <Route path="/team-profile/:teamId" element={<TeamsProfile />} />
-          <Route path="/match-detail/:id" element={<MatchDetails />} />
-          
-        </Routes>
-      </BrowserRouter>
+      <AuthProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Start />} />
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+
+            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path='/matches/list' element={<ProtectedRoute><MatchList /></ProtectedRoute>} />
+            <Route path='/matches/upcoming-matches' element={<ProtectedRoute><MyMatches /></ProtectedRoute>} />
+            <Route path='/matches/matches-history' element={<ProtectedRoute><MatchesHistory /></ProtectedRoute>} />
+            <Route path='/tournament/list' element={<ProtectedRoute><TournamentList /></ProtectedRoute>} />
+            <Route path='/tournament/my-tournaments' element={<ProtectedRoute><MyTournament /></ProtectedRoute>} />
+            <Route path='/teams/list' element={<ProtectedRoute><TeamsList /></ProtectedRoute>} />
+            <Route path='/notifications' element={<ProtectedRoute><NotificationPage /></ProtectedRoute>} />
+            <Route path='/matches/match-setup' element={<ProtectedRoute><MatchSetup /></ProtectedRoute>} />
+            <Route path='/settings' element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+            <Route path='/tournament/tournament-setup' element={<ProtectedRoute><TournamentSetup /></ProtectedRoute>} />
+            <Route path="/team/:teamId" element={<ProtectedRoute><TeamProfile /></ProtectedRoute>} />
+            <Route path="/teams/following-teams" element={<ProtectedRoute><FollowingTeams /></ProtectedRoute>} />
+            <Route path="/manage-cities" element={<ProtectedRoute><ManageCities /></ProtectedRoute>} />
+            <Route path="/manage-formats" element={<ProtectedRoute><ManageFormats /></ProtectedRoute>} />
+            <Route path="/manage-locations" element={<ProtectedRoute><ManageLocations /></ProtectedRoute>} />
+            <Route path="/team-profile/:teamId" element={<ProtectedRoute><TeamsProfile /></ProtectedRoute>} />
+            <Route path="/match-detail/:id" element={<ProtectedRoute><MatchDetails /></ProtectedRoute>} />
+
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
     </div>
   );
 }
