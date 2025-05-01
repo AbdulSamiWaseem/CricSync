@@ -1,50 +1,61 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import './matchSetup.css';
+import api from '../../utils/api'
 import DashboardHeader from '../../components/DashboardHeader/DashboardHeader';
 import Sidebar from '../../components/Sidebar/Siderbar';
 
 const MatchSetup = () => {
   const [formData, setFormData] = useState({
-    city: '',
-    area: '',
-    date: '',
-    time: '',
-    format: '5-over',
-    match_type: 'Quick',
+    date: "",
+    from_time: "",
+    to_time: "",
+    team_name: "",
+    city_id: "",
+    location_id: "",
+    format_id: ""
   });
 
   const [cities, setCities] = useState([]);
-  const [areas, setAreas] = useState([]);
+  const [locations, setLocations] = useState([]);
+  const [formats, setFormats] = useState([]);
 
   useEffect(() => {
-    const fetchCitiesAndAreas = async () => {
+    const fetchData = async () => {
       try {
-        // replace URLs with your actual endpoints
-        const cityRes = await axios.get('http://localhost:8000/api/cities/');
-        const areaRes = await axios.get('http://localhost:8000/api/areas/');
+        const [cityRes, locationRes, formatRes, userRes] = await Promise.all([
+          api.get('/cities/'),
+          api.get('/locations/'),
+          api.get('/formats/'),
+          api.get('/profile/')
+        ]);
         setCities(cityRes.data);
-        setAreas(areaRes.data);
+        setLocations(locationRes.data);
+        setFormats(formatRes.data);
+        setFormData(prev => ({
+          ...prev,
+          team_name: userRes.data.id
+        }));
       } catch (err) {
-        console.error("Error fetching cities or areas:", err);
+        console.error("Error fetching data:", err);
       }
     };
-    fetchCitiesAndAreas();
+    fetchData();
   }, []);
 
   const handleChange = (e) => {
-    setFormData(prev => ({
+    const { name, value } = e.target;
+    setFormData((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value
+      [name]: name === 'city_id' || name === 'location_id' || name === 'format_id' ? parseInt(value) : value
     }));
   };
 
   const handleSubmit = async () => {
     try {
-      const response = await axios.post('http://localhost:8000/api/matches/create/', formData);
+      await api.post('/matchsetups/', formData);
       alert('Match created successfully!');
     } catch (error) {
-      console.error('Error creating match:', error);
+      console.error('Error creating match:', error.response?.data || error.message);
       alert('Failed to create match.');
     }
   };
@@ -57,52 +68,51 @@ const MatchSetup = () => {
             <div className="form-container">
               <div className="first-col">
                 <div className="form-group">
-                  <label className="item1">Select City</label>
-                  <select name="city" onChange={handleChange}>
+                  <label>Select City</label>
+                  <select name="city_id" onChange={handleChange}>
                     <option value="">Select City</option>
                     {cities.map(city => (
-                      <option key={city.id} value={city.name}>{city.name}</option>
+                      <option key={city.id} value={city.id}>{city.name}</option>
                     ))}
                   </select>
                 </div>
                 <div className="form-group">
-                  <label className="item2">Input Date</label>
+                  <label>Date</label>
                   <input name="date" type="date" onChange={handleChange} />
                 </div>
               </div>
+
               <div className="second-col">
                 <div className="form-group">
-                  <label className="item1">Select Area</label>
-                  <select name="area" onChange={handleChange}>
-                    <option value="">Select Area</option>
-                    {areas.map(area => (
-                      <option key={area.id} value={area.name}>{area.name}</option>
-                    ))}
+                  <label>Select Location</label>
+                  <select name="location_id" onChange={handleChange}>
+                    <option value="">Select Location</option>
+                    {locations
+                      .filter(loc => loc.city_id === formData.city_id) // 🔍 Filter by selected city
+                      .map(location => (
+                        <option key={location.id} value={location.id}>{location.name}</option>
+                      ))}
                   </select>
                 </div>
                 <div className="form-group">
-                  <label className="item2">Input Time</label>
-                  <input name="time" type="time" onChange={handleChange} />
+                  <label>Start Time</label>
+                  <input name="from_time" type="time" onChange={handleChange} />
                 </div>
               </div>
             </div>
 
             <div className="dropdown-wrapper">
-              <div className="dropdown-1">
-                <label>Select Format</label>
-                <select name="format" onChange={handleChange}>
-                  <option>5-over</option>
-                  <option>10-over</option>
-                  <option>20-over</option>
-                  <option>50-over</option>
-                </select>
+              <div className="form-group">
+                <label>Finish Time</label>
+                <input name="to_time" type="time" onChange={handleChange} />
               </div>
-
-              <div className="dropdown-2">
-                <label>Select Match Type</label>
-                <select name="match_type" onChange={handleChange}>
-                  <option>Quick</option>
-                  <option>Tournament</option>
+              <div className="form-group dropdown-1">
+                <label>Select Format</label>
+                <select name="format_id" onChange={handleChange}>
+                  <option value="">Select Format</option>
+                  {formats.map(format => (
+                    <option key={format.id} value={format.id}>{format.name}</option>
+                  ))}
                 </select>
               </div>
             </div>

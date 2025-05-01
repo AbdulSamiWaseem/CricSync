@@ -1,34 +1,43 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 
-// Create a context for authentication
 const AuthContext = createContext();
 
-// Custom hook to use authentication context
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => {
-    // Check if user is already logged in by reading from localStorage
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true); // 🔹 new loading state
+
+  useEffect(() => {
     const savedUser = localStorage.getItem('user');
-    return savedUser ? JSON.parse(savedUser) : null;
-  });
+    const token = localStorage.getItem('access_token');
+
+    if (savedUser && token) {
+      setUser(JSON.parse(savedUser));
+    }
+
+    setLoading(false); // 🔹 Done loading
+  }, []);
 
   const login = (userData) => {
     setUser(userData);
     localStorage.setItem('user', JSON.stringify(userData));
-    localStorage.setItem('access_token', userData.accessToken); // Store the token
+    localStorage.setItem('access_token', userData.accessToken);
+    if (userData.refreshToken) {
+      localStorage.setItem('refresh_token', userData.refreshToken);
+    }
   };
 
   const logout = () => {
-    setUser(null); // Clear the user state
+    setUser(null);
     localStorage.removeItem('user');
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
-      {children}
+    <AuthContext.Provider value={{ user, login, logout, loading }}>
+      {!loading && children}
     </AuthContext.Provider>
   );
 };

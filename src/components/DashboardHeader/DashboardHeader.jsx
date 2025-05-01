@@ -16,15 +16,16 @@ const DashboardHeader = ({ children }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    console.log("going to fetch profile")
     fetchUserProfile();
   }, []);
 
   const fetchUserProfile = async () => {
     try {
-      const res = await api.get('/user/profile/');
+      const res = await api.get('/profile/');
       setUserData({
-        teamName: res.data.team_name || 'My Team',
-        teamLogo: res.data.team_logo || '/default-logo.png',
+        teamName: res.data.username || 'My Team',
+        teamLogo: res.data.profile_picture,
       });
     } catch (error) {
       console.error('Failed to load user profile', error);
@@ -34,6 +35,10 @@ const DashboardHeader = ({ children }) => {
   const handleLogout = () => {
     logout();  
     navigate("/login"); 
+  };
+  const capitalizeFirstLetter = (str) => {
+    if (!str) return '';
+    return str.charAt(0).toUpperCase() + str.slice(1);
   };
 
   return (
@@ -48,7 +53,7 @@ const DashboardHeader = ({ children }) => {
         <div className="profile-section">
           <Link to="/team-profile" className="team-info">
             <img src={userData.teamLogo || Logo} alt="Team Logo" className="team-logo" />
-            <span className="team-name">{userData.teamName || 'FAST XI'}</span>
+            <span className="team-name">{capitalizeFirstLetter(userData.teamName)}</span>
           </Link>
         </div>
 

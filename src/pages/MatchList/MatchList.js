@@ -3,10 +3,15 @@ import './matchList.css';
 import { CiFilter, CiSearch } from "react-icons/ci";
 import DashboardHeader from '../../components/DashboardHeader/DashboardHeader';
 import Sidebar from '../../components/Sidebar/Siderbar';
-import axios from 'axios';
+import api from '../../utils/api';
 
 const MatchList = () => {
     const [matches, setMatches] = useState([]);
+    const [cities, setCities] = useState([]);
+    const [locations, setLocations] = useState([]);
+    const [formats, setFormats] = useState([]);
+    const [profiles, setProfiles] = useState({}); // Store fetched team profiles
+
     const [filters, setFilters] = useState({
         city: '',
         area: '',
@@ -16,44 +21,59 @@ const MatchList = () => {
         format: '',
         search: ''
     });
+
     const [entries, setEntries] = useState(10);
 
     useEffect(() => {
-        setMatches([
-            {
-                id: 1,
-                format: 'T20',
-                overs: 20,
-                venue: 'Gaddafi Stadium',
-                location: 'Lahore',
-                date: '2025-05-01',
-                time: '15:00',
-                requesting_team: 'Lahore Lions'
-            },
-            {
-                id: 2,
-                format: 'T10',
-                overs: 10,
-                venue: 'DHA Sports Complex',
-                location: 'Lahore',
-                date: '2025-05-02',
-                time: '18:00',
-                requesting_team: 'DHA Gladiators'
-            }
-        ]);
+        fetchLookups();
+        fetchMatches();
     }, []);
+
+    const fetchLookups = async () => {
+        try {
+            const [citiesRes, locationsRes, formatsRes] = await Promise.all([
+                api.get('/cities/'),
+                api.get('/locations/'),
+                api.get('/formats/')
+            ]);
+            setCities(citiesRes.data);
+            setLocations(locationsRes.data);
+            setFormats(formatsRes.data);
+        } catch (err) {
+            console.error("Failed to fetch lookup data", err);
+        }
+    };
 
     const fetchMatches = async () => {
         try {
-            const response = await axios.get('http://127.0.0.1:8000/api/matches/', {
+            const response = await api.get('/matchsetups/', {
                 params: {
                     ...filters,
                     limit: entries
                 }
             });
-            setMatches(response.data);
+
+            const matchData = response.data;
+            setMatches(matchData);
+
+            // Fetch team profile names
+            const uniqueTeamIds = [...new Set(matchData.map(m => m.team_name))];
+
+            const profileResponses = await Promise.all(
+                uniqueTeamIds.map(id =>
+                    api.get(`/profile/${id}`).then(res => ({ id, username: res.data.username })).catch(() => ({ id, username: 'Unknown' }))
+                )
+            );
+
+            const profileMap = {};
+            profileResponses.forEach(({ id, username }) => {
+                profileMap[id] = username;
+            });
+
+            setProfiles(profileMap);
+
         } catch (err) {
-            console.error('Failed to fetch matches:', err);
+            console.error('Failed to fetch matches or profiles:', err);
         }
     };
 
@@ -71,11 +91,30 @@ const MatchList = () => {
 
     const handleEntriesChange = (e) => {
         setEntries(e.target.value);
+        fetchMatches(); // update match list when entries per page changes
     };
 
     const handleRequestMatch = (matchId) => {
         alert(`Requested match with ID: ${matchId}`);
-        // Later you can call API here
+    };
+
+    const getCityName = (id) => {
+        const city = cities.find(c => Number(c.id) === Number(id));
+        return city ? city.name : 'Unknown';
+    };
+
+    const getLocationName = (id) => {
+        const location = locations.find(l => Number(l.id) === Number(id));
+        return location ? location.name : 'Unknown';
+    };
+
+    const getFormatName = (id) => {
+        const format = formats.find(f => Number(f.id) === Number(id));
+        return format ? format.name : 'Unknown';
+    };
+
+    const getTeamName = (id) => {
+        return profiles?.[id] || 'Unknown';
     };
 
     return (
@@ -85,16 +124,30 @@ const MatchList = () => {
 
                     {/* Filters */}
                     <div className='match-filter container'>
-                        <select name="city" onChange={handleChange}><option value="">City</option><option value="Lahore">Lahore</option></select>
-                        <select name="area" onChange={handleChange}><option value="">Area</option><option value="DHA">DHA</option></select>
+                        <select name="city" onChange={handleChange}>
+                            <option value="">City</option>
+                            {cities.map(city => (
+                                <option key={city.id} value={city.id}>{city.name}</option>
+                            ))}
+                        </select>
+                        <select name="area" onChange={handleChange}>
+                            <option value="">Area</option>
+                            {locations.map(loc => (
+                                <option key={loc.id} value={loc.id}>{loc.name}</option>
+                            ))}
+                        </select>
                         <input type="date" name="date" onChange={handleChange} />
                         <input type="time" name="time" onChange={handleChange} />
-                        <select name="match_type" onChange={handleChange}><option value="">Match Type</option><option value="Friendly">Friendly</option></select>
+                        <select name="match_type" onChange={handleChange}>
+                            <option value="">Match Type</option>
+                            <option value="Friendly">Friendly</option>
+                            <option value="Tournament">Tournament</option>
+                        </select>
                         <select name="format" onChange={handleChange}>
                             <option value="">Format</option>
-                            <option value="T20">T20</option>
-                            <option value="T10">T10</option>
-                            <option value="ODI">ODI</option>
+                            {formats.map(format => (
+                                <option key={format.id} value={format.id}>{format.name}</option>
+                            ))}
                         </select>
                     </div>
 
@@ -120,7 +173,7 @@ const MatchList = () => {
                         </div>
                     </div>
 
-                    {/* Matches Cards */}
+                    {/* Match Cards */}
                     <div className="match-list">
                         {matches.length === 0 ? (
                             <p>No matches found.</p>
@@ -128,27 +181,24 @@ const MatchList = () => {
                             matches.map((match) => (
                                 <div className="match-card" key={match.id}>
                                     <div className="match-card-header">
-                                        <span className="match-format">{match.format}</span>
-                                        <span className="match-overs">{match.overs} Overs</span>
+                                        <span className="match-format">{getFormatName(match.format_id)}</span>
+                                        <span className="match-overs">From {match.from_time} to {match.to_time}</span>
                                     </div>
 
                                     <div className="match-card-body">
                                         <div className="match-info">
-                                            <div><strong>Venue:</strong> {match.venue}</div>
-                                            <div><strong>Location:</strong> {match.location}</div>
+                                            <div><strong>City:</strong> {getCityName(match.city_id)}</div>
+                                            <div><strong>Location:</strong> {getLocationName(match.location_id)}</div>
                                             <div><strong>Date:</strong> {match.date}</div>
-                                            <div><strong>Time:</strong> {match.time}</div>
-                                            <div><strong>Requested By:</strong> {match.requesting_team}</div>
+                                            <div><strong>Requested By:</strong> {getTeamName(match.team_name)}</div>
                                         </div>
                                     </div>
 
-                                    {/* Request Match Button */}
                                     <div className="match-request-btn">
                                         <button onClick={() => handleRequestMatch(match.id)}>
                                             Request Match
                                         </button>
                                     </div>
-
                                 </div>
                             ))
                         )}
