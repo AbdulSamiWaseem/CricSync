@@ -5,12 +5,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import api from '../../utils/api';
 import Logo from '../../assets/logo.png';
 import { useAuth } from "../../context/AuthContext";
+import { capitalizeFirstLetter } from '../../utils/helper';
 
 const DashboardHeader = ({ children }) => {
   const { logout } = useAuth();
   const [userData, setUserData] = useState({
     teamName: '',
     teamLogo: '',
+    teamId: '',
   });
 
   const navigate = useNavigate();
@@ -26,6 +28,7 @@ const DashboardHeader = ({ children }) => {
       setUserData({
         teamName: res.data.username || 'My Team',
         teamLogo: res.data.profile_picture,
+        teamId: res.data.id 
       });
     } catch (error) {
       console.error('Failed to load user profile', error);
@@ -33,13 +36,10 @@ const DashboardHeader = ({ children }) => {
   };
 
   const handleLogout = () => {
-    logout();  
-    navigate("/login"); 
+    logout();
+    navigate("/login");
   };
-  const capitalizeFirstLetter = (str) => {
-    if (!str) return '';
-    return str.charAt(0).toUpperCase() + str.slice(1);
-  };
+ 
 
   return (
     <div style={{ height: "100vh" }}>
@@ -51,7 +51,7 @@ const DashboardHeader = ({ children }) => {
         </Link>
 
         <div className="profile-section">
-          <Link to="/team-profile" className="team-info">
+          <Link to={`/team/${userData.teamId}`} className="team-info">
             <img src={userData.teamLogo || Logo} alt="Team Logo" className="team-logo" />
             <span className="team-name">{capitalizeFirstLetter(userData.teamName)}</span>
           </Link>

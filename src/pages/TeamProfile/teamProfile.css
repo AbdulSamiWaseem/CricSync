@@ -110,7 +110,12 @@
 .red-body {
   background-color: #f2aaaa;
 }
-
+.yellow-bar{
+  background-color: goldenrod;
+}
+.yellow-body{
+  background-color: rgb(255, 230, 87);
+}
 
 .history-section {
   width: 100%;
@@ -136,4 +141,26 @@
   margin-bottom: 5px;
   word-wrap: break-word;
 }
+.history-item {
+  padding: 8px;
+  margin-bottom: 5px;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.history-item.won {
+  background-color: #d4f7d4;
+  color: #2e7d32;
+}
+
+.history-item.lost {
+  background-color: #fbdada;
+  color: #c62828;
+}
+
+.history-item.tied {
+  background-color: #fff6d5;
+  color: #9c8500;
+}
+
 

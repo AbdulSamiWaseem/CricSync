@@ -1,34 +1,56 @@
 import React, { useState, useEffect } from 'react';
-import UpcomingMatchesList from '../../components/UpcomingMatchesList';
 import './myMatches.css';
 import { CiSearch } from "react-icons/ci";
 import DashboardHeader from '../../components/DashboardHeader/DashboardHeader';
 import Sidebar from '../../components/Sidebar/Siderbar';
+import api from '../../utils/api';  // Import the api.js instance
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import MyUpcomingMatchesList from '../../components/MyUpcomingMatchesList';
 
 const MyMatches = () => {
   const navigate = useNavigate();
-  const [matches, setMatches] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filteredMatches, setFilteredMatches] = useState([]);
 
-  // Fetch matches from backend
+  const [matches, setMatches] = useState([]);
+  const [filteredMatches, setFilteredMatches] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+
   useEffect(() => {
-    const fetchMatches = async () => {
+    const fetchScheduledMatches = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/matches/my/");
-        setMatches(response.data);
-        setFilteredMatches(response.data); // Initially show all
+        // Get user info (requires JWT token)
+        const profileRes = await api.get("profile/");
+        const userId = profileRes.data.id;
+
+        // Get all progress entries
+        const progressRes = await api.get("progress/");
+        const progress = progressRes.data;
+
+        // Filter for accepted and not-yet-completed matches requested by this user
+        const relevantProgress = progress.filter(p =>
+          p.status === 1 &&
+          p.winner === null &&
+          p.requested_by === userId
+        );
+
+        const matchIds = relevantProgress.map(p => p.match);
+
+        // Get all match setups
+        const matchesRes = await api.get("matchsetups/");
+        const allMatchSetups = matchesRes.data;
+
+        // Get only those matches that are in matchIds
+        const upcomingMatches = allMatchSetups.filter(m => matchIds.includes(m.id));
+
+        setMatches(upcomingMatches);
+        setFilteredMatches(upcomingMatches);
       } catch (error) {
-        console.error("Error fetching matches:", error);
+        console.error("Error fetching scheduled matches:", error);
       }
     };
 
-    fetchMatches();
+    fetchScheduledMatches();
   }, []);
 
-  // Handle search input change
   const handleSearch = () => {
     const lowerSearch = searchTerm.toLowerCase();
     const filtered = matches.filter(match =>
@@ -38,7 +60,6 @@ const MyMatches = () => {
     setFilteredMatches(filtered);
   };
 
-  // Redirect to match detail
   const handleMatchClick = (matchId) => {
     navigate(`/match-detail/${matchId}`);
   };
@@ -61,14 +82,14 @@ const MyMatches = () => {
             </div>
           </div>
 
-          <UpcomingMatchesList
-            matchData={filteredMatches}
+          <MyUpcomingMatchesList
+            matches={filteredMatches}
             onMatchClick={handleMatchClick}
           />
         </div>
       </Sidebar>
     </DashboardHeader>
   );
-}
+};
 
 export default MyMatches;

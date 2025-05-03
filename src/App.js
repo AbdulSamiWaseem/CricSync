@@ -22,7 +22,6 @@ import MatchesHistory from './pages/MatchesHistory/MatchesHistory';
 import ManageCities from './pages/ManageCities';
 import ManageFormats from './pages/ManageFormats';
 import ManageLocations from './pages/ManageLocations';
-import TeamsProfile from './pages/TeamsProfile/TeamsProfile';
 import MatchDetails from './pages/MatchDetails/MatchDetails';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute'
@@ -48,12 +47,11 @@ function App() {
             <Route path='/matches/match-setup' element={<ProtectedRoute><MatchSetup /></ProtectedRoute>} />
             <Route path='/settings' element={<ProtectedRoute><Settings /></ProtectedRoute>} />
             <Route path='/tournament/tournament-setup' element={<ProtectedRoute><TournamentSetup /></ProtectedRoute>} />
-            <Route path="/team/:teamId" element={<ProtectedRoute><TeamProfile /></ProtectedRoute>} />
+            <Route path="/team/:id" element={<ProtectedRoute><TeamProfile /></ProtectedRoute>} />
             <Route path="/teams/following-teams" element={<ProtectedRoute><FollowingTeams /></ProtectedRoute>} />
             <Route path="/manage-cities" element={<ProtectedRoute><ManageCities /></ProtectedRoute>} />
             <Route path="/manage-formats" element={<ProtectedRoute><ManageFormats /></ProtectedRoute>} />
             <Route path="/manage-locations" element={<ProtectedRoute><ManageLocations /></ProtectedRoute>} />
-            <Route path="/team-profile/:teamId" element={<ProtectedRoute><TeamsProfile /></ProtectedRoute>} />
             <Route path="/match-detail/:id" element={<ProtectedRoute><MatchDetails /></ProtectedRoute>} />
 
           </Routes>

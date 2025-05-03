@@ -3,15 +3,14 @@ import axios from 'axios';
 import DashboardHeader from '../../components/DashboardHeader/DashboardHeader';
 import Sidebar from '../../components/Sidebar/Siderbar';
 import './settings.css';
-import Logo from '../../assets/logo.png'
+import Logo from '../../assets/logo.png';
 
 const Settings = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    old_password: '',
-    new_password: '',
-    confirm_password: '',
+    phone: '', // Added phone number field
+    profile_photo: null, // Added profile photo field
   });
 
   const [teamData, setTeamData] = useState({
@@ -33,6 +32,7 @@ const Settings = () => {
         ...prev,
         name: res.data.name,
         email: res.data.email,
+        phone: res.data.phone, // Assuming the backend sends phone number
       }));
     } catch (error) {
       console.error('Error fetching user:', error);
@@ -60,15 +60,32 @@ const Settings = () => {
     }));
   };
 
+  const handleFileChange = (e) => {
+    const { files } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      profile_photo: files[0],
+    }));
+  };
+
   const handleUpdate = async () => {
-    const { new_password, confirm_password } = formData;
-    if (new_password && new_password !== confirm_password) {
-      alert('New passwords do not match!');
-      return;
+    const { name, email, phone, profile_photo } = formData;
+
+    // Create FormData to send the profile photo
+    const updatedData = new FormData();
+    updatedData.append('name', name);
+    updatedData.append('email', email);
+    updatedData.append('phone', phone);
+    if (profile_photo) {
+      updatedData.append('profile_photo', profile_photo);
     }
 
     try {
-      await axios.put('http://localhost:8000/api/user/update/', formData);
+      await axios.put('http://localhost:8000/api/user/update/', updatedData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
       alert('Profile updated successfully!');
     } catch (err) {
       alert(err.response?.data?.error || 'Update failed');
@@ -86,7 +103,6 @@ const Settings = () => {
     }
   };
 
-
   return (
     <DashboardHeader>
       <Sidebar>
@@ -99,36 +115,34 @@ const Settings = () => {
           <div className="settings-form">
             <h4>Edit Profile</h4>
             <label>Name</label>
-            <input className="form-input" name="name" value={formData.name} onChange={handleChange} />
+            <input
+              className="form-input"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+            />
 
             <label>Email</label>
-            <input className="form-input" name="email" value={formData.email} onChange={handleChange} />
-
-            <label>Old Password</label>
             <input
               className="form-input"
-              type="password"
-              name="old_password"
-              value={formData.old_password}
+              name="email"
+              value={formData.email}
               onChange={handleChange}
             />
 
-            <label>New Password</label>
+            <label>Phone Number</label>
             <input
               className="form-input"
-              type="password"
-              name="new_password"
-              value={formData.new_password}
+              name="phone"
+              value={formData.phone}
               onChange={handleChange}
             />
 
-            <label>Confirm New Password</label>
+            <label>Profile Photo</label>
             <input
+              type="file"
               className="form-input"
-              type="password"
-              name="confirm_password"
-              value={formData.confirm_password}
-              onChange={handleChange}
+              onChange={handleFileChange}
             />
 
             <div className="btn-group">

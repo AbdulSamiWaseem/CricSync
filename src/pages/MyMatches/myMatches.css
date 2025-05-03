@@ -1,52 +1,47 @@
-.match-list {
-    margin: 20px;
-}
-
-.my-match-search-section {
+.upcoming-matches-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 20px;
+  }
+  
+  .match-card {
     background-color: white;
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  
+  .match-card:hover {
+    transform: translateY(-3px);
+  }
+  
+  .teams {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-radius: 20px;
-    margin: 20px 0;
-    
-}
-
-
-
-.search-section-b {
-    background-color: white;
-    border: 1px solid #9747ff;
-    color: black !important;
-    display: flex;
-    border-radius: 20px;
-    font-size: 1rem;
-    justify-content: space-between;
-}
-
-.search-section-b>input {
-    border: none;
-    border-top-left-radius: 20px;
-    border-bottom-left-radius: 20px;
-    padding: 0 10px;
-}
-
-.search-section-b>button {
-    all: unset;
-    background-color: #9747ff;
-    color: white;
-    border-top-right-radius: 18px;
-    border-bottom-right-radius: 18px;
-    padding: 0 10px;
-    font-size: 1.25rem;
-}
-
-.search-section-b>button>svg {
-    font-weight: bold !important;
-}
-.search-section-a {
-    color: #9747ff;
-    font-size: larger;
-    font-weight: 700;
-}
-
+  }
+  
+  .vs {
+    margin: 0 8px;
+    font-weight: bold;
+    color: #555;
+  }
+  
+  .match-info p {
+    margin: 4px 0;
+    font-size: 14px;
+    color: #333;
+  }
+  
+  .no-matches {
+    margin-top: 20px;
+    font-style: italic;
+    color: #888;
+  }
+  

@@ -3,84 +3,27 @@ import './matchesHistory.css';
 import { CiFilter, CiSearch } from "react-icons/ci";
 import DashboardHeader from '../../components/DashboardHeader/DashboardHeader';
 import Sidebar from '../../components/Sidebar/Siderbar';
-import axios from 'axios'; // Import axios for API requests
+import api from '../../utils/api'; // Use your api.js for handling requests
 
 const MatchesHistory = () => {
     const [matches, setMatches] = useState([]);
     const [search, setSearch] = useState('');
     const [filter, setFilter] = useState('');
     const [entries, setEntries] = useState(10);
-    const [matchResult, setMatchResult] = useState(''); // Track win/loss status
+    const [matchResult, setMatchResult] = useState('');
+
     useEffect(() => {
         const fetchMatchHistory = async () => {
             try {
-                // Mock API Response
-                const response = {
-                    data: [
-                        {
-                            id: 1,
-                            result: "Won",
-                            format: "T20",
-                            venue: "FAST",
-                            location: "Lahore",
-                            time: "2025-04-20 15:00",
-                            opponent: "PU",
-                            date: "2025-04-20"
-                        },
-                        {
-                            id: 2,
-                            result: "Lost",
-                            format: "ODI",
-                            venue: "Test",
-                            location: "FAST",
-                            time: "2025-04-21 18:00",
-                            opponent: "GIKI",
-                            date: "2025-04-21"
-                        },
-                        {
-                            id: 3,
-                            result: "Won",
-                            format: "TEST",
-                            venue: "International Arena",
-                            location: "Sanagala",
-                            time: "2025-04-22 10:00",
-                            opponent: "FAST",
-                            date: "2025-04-22"
-                        },
-                        {
-                            id: 4,
-                            result: "Lost",
-                            format: "T10",
-                            venue: "Lahore",
-                            location: "LUMS",
-                            time: "2025-04-23 20:00",
-                            opponent: "LUMS",
-                            date: "2025-04-23"
-                        },
-                        {
-                            id: 5,
-                            result: "Won",
-                            format: "ODI",
-                            venue: "National Stadium ",
-                            location: "Karachi",
-                            time: "2025-04-24 12:30",
-                            opponent: "Lahore qalanadar",
-                            date: "2025-04-24"
-                        },
-                        {
-                            id: 6,
-                            result: "Lost",
-                            format: "T20",
-                            venue: "Lahore",
-                            location: "Gadafi",
-                            time: "2025-04-25 14:00",
-                            opponent: "Zalmi",
-                            date: "2025-04-25"
-                        }
-                    ]
-                };
+                // Fetch match history with filters from backend
+                const response = await api.get('match-history/', {
+                    params: {
+                        search: search,
+                        filter: filter,
+                        result: matchResult, // Filter by win/loss
+                    },
+                });
 
-                // Simulate API response
                 setMatches(response.data);
             } catch (error) {
                 console.error('Error fetching match history:', error);
@@ -88,27 +31,7 @@ const MatchesHistory = () => {
         };
 
         fetchMatchHistory();
-    }, [search, filter, matchResult]);
-
-    // Fetch match history from the backend
-    // useEffect(() => {
-    //     const fetchMatchHistory = async () => {
-    //         try {
-    //             const response = await axios.get('http://127.0.0.1:8000/api/match-history/', {
-    //                 params: {
-    //                     search: search,
-    //                     filter: filter,
-    //                     result: matchResult, // Filter by win/loss
-    //                 },
-    //             });
-    //             setMatches(response.data);
-    //         } catch (error) {
-    //             console.error('Error fetching match history:', error);
-    //         }
-    //     };
-
-    //     fetchMatchHistory();
-    // }, [search, filter, matchResult]);
+    }, [search, filter, matchResult, entries]);  // Add entries to re-fetch if pagination changes
 
     // Handle changes in search input
     const handleSearchChange = (e) => {
@@ -173,7 +96,7 @@ const MatchesHistory = () => {
                         </div>
                     </div>
 
-                    <div className="matches-history-list" style={{width:"100%"}}>
+                    <div className="matches-history-list" style={{ width: "100%" }}>
                         {matches.length > 0 ? (
                             matches.slice(0, entries).map((match) => (
                                 <div className="match-item" key={match.id}>
