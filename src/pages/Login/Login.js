@@ -52,10 +52,10 @@ const Login = () => {
         <div className='pb-1' style={{ fontSize: "12px" }}> Welcome Back</div>
         <div className='fs-4 fw-semibold ml-1 pb-3'>Login To Your Account</div>
 
-        <label>Email</label>
+        <label className='input_label'>Email</label>
         <input className='user-input' value={email} onChange={(e) => setEmail(e.target.value)} />
 
-        <label>Password</label>
+        <label className='input_label'>Password</label>
         <input className='user-input' type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
 
         {errorMsg && <div className="text-danger mt-2">{errorMsg}</div>}

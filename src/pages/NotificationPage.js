@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   FaBell,
   FaCheckCircle,
@@ -8,33 +8,7 @@ import {
 } from 'react-icons/fa';
 import DashboardHeader from '../components/DashboardHeader/DashboardHeader';
 import Sidebar from '../components/Sidebar/Siderbar';
-
-const initialNotifications = [
-  {
-    id: 1,
-    type: 'success',
-    message: 'Your match setup is complete!',
-    time: '2 minutes ago',
-  },
-  {
-    id: 2,
-    type: 'match-request',
-    message: 'Ali sent you a match request.',
-    time: '10 minutes ago',
-  },
-  {
-    id: 3,
-    type: 'match-accepted',
-    message: 'Umar accepted your match request!',
-    time: '1 hour ago',
-  },
-  {
-    id: 4,
-    type: 'error',
-    message: 'Team registration failed. Please try again.',
-    time: 'Yesterday',
-  },
-];
+import api from '../utils/api';
 
 const getIcon = (type) => {
   switch (type) {
@@ -67,23 +41,82 @@ const getBorderColor = (type) => {
   }
 };
 
+const determineType = (message) => {
+  const msg = message.toLowerCase();
+  if (msg.includes('accepted')) return 'match-accepted';
+  if (msg.includes('sent') && msg.includes('request')) return 'match-request';
+  if (msg.includes('failed')) return 'error';
+  if (msg.includes('complete')) return 'success';
+  return 'info';
+};
+
+const formatTime = (timestamp) => {
+  const date = new Date(timestamp);
+  return date.toLocaleString();
+};
+
 const NotificationPage = () => {
-  const [notifications, setNotifications] = useState(initialNotifications);
+  const [notifications, setNotifications] = useState([]);
+  const [userId, setUserId] = useState(null);
+
+  useEffect(() => {
+    // Fetch user profile
+    api.get('/profile/')
+      .then((res) => {
+        setUserId(res.data.id);
+      })
+      .catch((err) => {
+        console.error('Failed to fetch profile:', err);
+      });
+  }, []);
+
+  useEffect(() => {
+    if (!userId) return;
+
+    api.get('/notifications/')
+      .then((res) => {
+        const formatted = res.data
+          .filter((n) => n.receiver === userId) // Filter for this user only
+          .map((n) => ({
+            id: n.id,
+            matchId: n.match_id, // If needed for accept/reject
+            type: determineType(n.message),
+            message: n.message,
+            time: formatTime(n.timestamp),
+          }));
+        setNotifications(formatted.reverse());
+      })
+      .catch((err) => {
+        console.error('Failed to load notifications:', err);
+      });
+  }, [userId]);
 
   const handleDismiss = (id) => {
     setNotifications((prev) => prev.filter((n) => n.id !== id));
   };
 
-  const handleAccept = (id) => {
-    // Future: Send accept match request to backend
-    alert("Match request accepted!");
-    handleDismiss(id);
+  const handleAccept = (matchId, notifId) => {
+    api.post(`/matches/${matchId}/accept/`)
+      .then(() => {
+        alert('Match request accepted!');
+        handleDismiss(notifId);
+      })
+      .catch((err) => {
+        console.error('Failed to accept match:', err);
+        alert('Failed to accept match.');
+      });
   };
 
-  const handleReject = (id) => {
-    // Future: Send reject match request to backend
-    alert("Match request rejected.");
-    handleDismiss(id);
+  const handleReject = (matchId, notifId) => {
+    api.post(`/matches/${matchId}/reject/`)
+      .then(() => {
+        alert('Match request rejected.');
+        handleDismiss(notifId);
+      })
+      .catch((err) => {
+        console.error('Failed to reject match:', err);
+        alert('Failed to reject match.');
+      });
   };
 
   return (
@@ -112,61 +145,75 @@ const NotificationPage = () => {
           </h2>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {notifications.map((notification) => (
+            {notifications.length === 0 ? (
               <div
-                key={notification.id}
                 style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '1rem',
-                  padding: '1rem',
+                  textAlign: 'center',
+                  padding: '2rem',
                   backgroundColor: '#fff',
-                  borderLeft: `6px solid ${getBorderColor(notification.type)}`,
                   borderRadius: '10px',
                   boxShadow: '0 1px 4px rgba(0, 0, 0, 0.08)',
+                  color: '#777',
+                  fontSize: '16px',
                 }}
               >
-                {getIcon(notification.type)}
-
-                <div style={{ flexGrow: 1 }}>
-                  <p style={{ margin: 0, fontWeight: '500', fontSize: '16px', color: 'gray' }}>
-                    {notification.message}
-                  </p>
-                  <span style={{ fontSize: '12px', color: '#666' }}>{notification.time}</span>
-                </div>
-
-                {notification.type === 'match-request' && (
-                  <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    <button
-                      className="btn btn-sm btn-success"
-                      onClick={() => handleAccept(notification.id)}
-                    >
-                      Accept
-                    </button>
-                    <button
-                      className="btn btn-sm btn-danger"
-                      onClick={() => handleReject(notification.id)}
-                    >
-                      Reject
-                    </button>
-                  </div>
-                )}
-
-                {notification.type !== 'match-request' && (
-                  <button
-                    onClick={() => handleDismiss(notification.id)}
-                    style={{
-                      border: 'none',
-                      background: 'transparent',
-                      cursor: 'pointer',
-                    }}
-                    title="Dismiss"
-                  >
-                    <FaTimesCircle color="#888" size={16} />
-                  </button>
-                )}
+                <FaInfoCircle size={20} color="#3B82F6" style={{ marginBottom: '0.5rem' }} />
+                <p style={{ margin: 0 }}>No notifications yet.</p>
               </div>
-            ))}
+            ) : (
+              notifications.map((notification) => (
+                <div
+                  key={notification.id}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '1rem',
+                    padding: '1rem',
+                    backgroundColor: '#fff',
+                    borderLeft: `6px solid ${getBorderColor(notification.type)}`,
+                    borderRadius: '10px',
+                    boxShadow: '0 1px 4px rgba(0, 0, 0, 0.08)',
+                  }}
+                >
+                  {getIcon(notification.type)}
+
+                  <div style={{ flexGrow: 1 }}>
+                    <p style={{ margin: 0, fontWeight: '500', fontSize: '16px', color: 'gray' }}>
+                      {notification.message}
+                    </p>
+                    <span style={{ fontSize: '12px', color: '#666' }}>{notification.time}</span>
+                  </div>
+
+                  {notification.type === 'match-request' ? (
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                      <button
+                        className="btn btn-sm btn-success"
+                        onClick={() => handleAccept(notification.matchId, notification.id)}
+                      >
+                        Accept
+                      </button>
+                      <button
+                        className="btn btn-sm btn-danger"
+                        onClick={() => handleReject(notification.matchId, notification.id)}
+                      >
+                        Reject
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => handleDismiss(notification.id)}
+                      style={{
+                        border: 'none',
+                        background: 'transparent',
+                        cursor: 'pointer',
+                      }}
+                      title="Dismiss"
+                    >
+                      <FaTimesCircle color="#888" size={16} />
+                    </button>
+                  )}
+                </div>
+              )))}
           </div>
         </div>
       </Sidebar>
