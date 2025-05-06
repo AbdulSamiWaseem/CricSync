@@ -24,10 +24,16 @@ import ManageFormats from './pages/ManageFormats';
 import ManageLocations from './pages/ManageLocations';
 import MatchDetails from './pages/MatchDetails/MatchDetails';
 import { AuthProvider } from './context/AuthContext';
-import ProtectedRoute from './components/ProtectedRoute'
+import ProtectedRoute from './components/ProtectedRoute';
+import RequireAdmin from './components/RequireAdmin';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+
 function App() {
   return (
     <div className="App">
+      <ToastContainer position="top-right" autoClose={3000} />
       <AuthProvider>
         <BrowserRouter>
           <Routes>
@@ -49,9 +55,9 @@ function App() {
             <Route path='/tournament/tournament-setup' element={<ProtectedRoute><TournamentSetup /></ProtectedRoute>} />
             <Route path="/team/:id" element={<ProtectedRoute><TeamProfile /></ProtectedRoute>} />
             <Route path="/teams/following-teams" element={<ProtectedRoute><FollowingTeams /></ProtectedRoute>} />
-            <Route path="/manage-cities" element={<ProtectedRoute><ManageCities /></ProtectedRoute>} />
-            <Route path="/manage-formats" element={<ProtectedRoute><ManageFormats /></ProtectedRoute>} />
-            <Route path="/manage-locations" element={<ProtectedRoute><ManageLocations /></ProtectedRoute>} />
+            <Route path="/manage-cities" element={<RequireAdmin><ProtectedRoute><ManageCities /></ProtectedRoute></RequireAdmin>} />
+            <Route path="/manage-formats" element={<RequireAdmin><ProtectedRoute><ManageFormats /></ProtectedRoute></RequireAdmin>} />
+            <Route path="/manage-locations" element={<RequireAdmin><ProtectedRoute><ManageLocations /></ProtectedRoute></RequireAdmin>} />
             <Route path="/match-detail/:id" element={<ProtectedRoute><MatchDetails /></ProtectedRoute>} />
 
           </Routes>

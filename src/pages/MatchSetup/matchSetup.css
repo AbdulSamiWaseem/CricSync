@@ -65,7 +65,7 @@ select {
   width: 100%;
 }
 
-input:focus,
+
 select:focus {
   border-color: #8e70ff;
   box-shadow: 0 0 0 2px rgba(142, 112, 255, 0.2);

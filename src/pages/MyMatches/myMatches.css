@@ -3,6 +3,7 @@
     flex-direction: column;
     gap: 16px;
     margin-top: 20px;
+    width: 100%;
   }
   
   .match-card {
@@ -37,6 +38,7 @@
     margin: 4px 0;
     font-size: 14px;
     color: #333;
+    padding: 10px;
   }
   
   .no-matches {

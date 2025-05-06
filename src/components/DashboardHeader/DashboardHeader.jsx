@@ -18,7 +18,6 @@ const DashboardHeader = ({ children }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log("going to fetch profile")
     fetchUserProfile();
   }, []);
 

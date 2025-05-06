@@ -3,7 +3,7 @@ import './teamProfile.css';
 import DashboardHeader from '../../components/DashboardHeader/DashboardHeader';
 import Sidebar from '../../components/Sidebar/Siderbar';
 import { useParams } from 'react-router-dom';
-import api from '../../utils/api'; 
+import api from '../../utils/api';
 import { capitalizeFirstLetter } from '../../utils/helper';
 
 const TeamProfile = () => {
@@ -22,59 +22,78 @@ const TeamProfile = () => {
 
   useEffect(() => {
     const fetchTeamStats = async () => {
-      const profileRes = await api.get(`/profile/${id}`);
-      const profileData = profileRes.data;
-    
-      const teamId = profileData.id;
-      const teamName = profileData.username;
-      const profilePic = profileData.profile_picture;
-    
-      const progressRes = await api.get('/progress/');
-      const progressMatches = progressRes.data;
-    
-      const completedMatches = progressMatches.filter(
-        m => m.status === 2 && m.requested_by === teamId
-      );
-    
-      const totalMatches = completedMatches.length;
-      let wins = 0, losses = 0, ties = 0;
-    
-      const history = completedMatches.map(match => {
-        let result;
-        if (match.winner === teamId) {
-          wins++;
-          result = 'Won';
-        } else if (match.winner === null) {
-          ties++;
-          result = 'Tied';
-        } else {
-          losses++;
-          result = 'Lost';
-        }
-    
-        return {
-          id: match.id,
-          matchId: match.match,
-          result
-        };
-      });
-    
-      setMatchHistory(history);
-    
-      setTeamData({
-        id: teamId,
-        name: teamName,
-        logo: profilePic,
-        total_matches: totalMatches,
-        wins,
-        losses,
-        ties
-      });
+      try {
+        const profileRes = await api.get(`/profile/${id}`);
+        const teamProfile = profileRes.data;
+
+        const [progressRes, matchSetupRes] = await Promise.all([
+          api.get("/progress/"),
+          api.get("/matchsetups/")
+        ]);
+
+        const teamId = teamProfile.id;
+        const progress = progressRes.data;
+        const matchSetups = matchSetupRes.data;
+
+        // Map match ID -> matchsetup
+        const matchMap = Object.fromEntries(matchSetups.map(m => [m.id, m]));
+
+        // Only take latest status per match (e.g. status 2 or 3)
+        const latestMatches = {};
+        progress.forEach(p => {
+          const current = latestMatches[p.match];
+          if (!current || current.status < p.status) {
+            latestMatches[p.match] = p;
+          }
+        });
+
+        let wins = 0, losses = 0, ties = 0;
+        const matchHistory = [];
+
+        Object.values(latestMatches).forEach(p => {
+          const setup = matchMap[p.match];
+          if (!setup) return;
+
+          const isInvolved = setup.team_name === teamId || p.requested_by === teamId;
+          const isFinished = p.status === 2 || p.status === 3;
+
+          if (isInvolved && isFinished) {
+            let result = 'Tied';
+            if (p.winner === teamId) {
+              wins++;
+              result = 'Won';
+            } else if (p.winner === null) {
+              ties++;
+            } else {
+              losses++;
+              result = 'Lost';
+            }
+
+            matchHistory.push({
+              matchId: p.match,
+              result
+            });
+          }
+        });
+
+        setMatchHistory(matchHistory);
+        setTeamData({
+          id: teamId,
+          name: teamProfile.username,
+          logo: teamProfile.profile_picture,
+          total_matches: matchHistory.length,
+          wins,
+          losses,
+          ties
+        });
+      } catch (err) {
+        console.error("Error loading team stats:", err);
+      }
     };
-    
 
     fetchTeamStats();
   }, [id]);
+
 
   return (
     <DashboardHeader>

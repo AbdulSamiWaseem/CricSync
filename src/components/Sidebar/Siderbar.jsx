@@ -2,8 +2,8 @@ import React from 'react';
 import './sidebar.css';
 import { Link } from 'react-router-dom';
 import { RxDashboard } from "react-icons/rx";
-import { BsHouse } from "react-icons/bs";
-import { RiCheckboxMultipleLine } from "react-icons/ri";
+import { RiTeamFill } from "react-icons/ri";
+import { TbCricket } from "react-icons/tb";
 import { FaPen } from "react-icons/fa";
 import { FaRegCircle } from "react-icons/fa";
 import logo from '../../assets/cricsync.png';
@@ -45,7 +45,7 @@ const Sidebar = ({ children }) => {
                   aria-expanded="true"
                   aria-controls="collapseMatches"
                 >
-                  <BsHouse size={25} /> Matches
+                  <TbCricket size={25} /> Matches
                 </button>
               </h2>
               <div id="collapseMatches" className="accordion-collapse collapse show">
@@ -59,7 +59,7 @@ const Sidebar = ({ children }) => {
             </div>
 
             {/* Tournament */}
-            <div className="accordion-item sidebar-item">
+            {/* <div className="accordion-item sidebar-item">
               <h2 className="accordion-header">
                 <button
                   className="accordion-button sidebar-button collapsed"
@@ -79,7 +79,7 @@ const Sidebar = ({ children }) => {
                   <Link to="/tournament/tournament-setup" style={{ textDecoration: 'none' }}><li><FaRegCircle /> Tournament Setup</li></Link>
                 </div>
               </div>
-            </div>
+            </div> */}
 
             {/* Teams */}
             <div className="accordion-item sidebar-item">
@@ -92,13 +92,13 @@ const Sidebar = ({ children }) => {
                   aria-expanded="true"
                   aria-controls="collapseTeams"
                 >
-                  <BsHouse size={25} /> Teams
+                  <RiTeamFill size={25} /> Teams
                 </button>
               </h2>
               <div id="collapseTeams" className="accordion-collapse collapse show">
                 <div className="accordion-body">
                   <Link to="/teams/list" style={{ textDecoration: 'none' }}><li><FaRegCircle /> List</li></Link>
-                  <Link to="/teams/following-teams" style={{ textDecoration: 'none' }}><li><FaRegCircle /> Following Teams</li></Link>
+                  {/* <Link to="/teams/following-teams" style={{ textDecoration: 'none' }}><li><FaRegCircle /> Following Teams</li></Link> */}
                 </div>
               </div>
             </div>
@@ -106,7 +106,7 @@ const Sidebar = ({ children }) => {
             {/* Settings */}
             <div className='accordion-item sidebar-item'>
               <div className='accordion-body' style={{ padding: "16px 20px" }}>
-                <Link to="/settings" ><li style={{ padding: "0" }}><FaPen size={25} /> Settings</li></Link>
+                <Link to="/settings" ><li style={{ padding: "0" }}><FaPen size={25} /> Edit Profile</li></Link>
               </div>
             </div>
           </div>

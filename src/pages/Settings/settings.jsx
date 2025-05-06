@@ -1,54 +1,47 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import DashboardHeader from '../../components/DashboardHeader/DashboardHeader';
 import Sidebar from '../../components/Sidebar/Siderbar';
 import './settings.css';
-import Logo from '../../assets/logo.png';
+import api from '../../utils/api';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const Settings = () => {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
-    name: '',
+    username: '',
     email: '',
-    phone: '', // Added phone number field
-    profile_photo: null, // Added profile photo field
+    phone_number: '',
+    profile_picture: null,
   });
 
-  const [teamData, setTeamData] = useState({
-    teamName: '',
-    logo: '',
-  });
-
+  const [previewImage, setPreviewImage] = useState('');
   const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState(false);
 
   useEffect(() => {
-    fetchUserDetails();
-    fetchTeamDetails();
+    fetchProfile();
   }, []);
 
-  const fetchUserDetails = async () => {
+  const fetchProfile = async () => {
     try {
-      const res = await axios.get('http://localhost:8000/api/user/profile/');
-      setFormData((prev) => ({
-        ...prev,
-        name: res.data.name,
-        email: res.data.email,
-        phone: res.data.phone, // Assuming the backend sends phone number
-      }));
-    } catch (error) {
-      console.error('Error fetching user:', error);
-    }
-  };
+      const res = await api.get('profile/');
+      const data = res.data;
 
-  const fetchTeamDetails = async () => {
-    try {
-      const res = await axios.get('http://localhost:8000/api/team/profile/');
-      setTeamData({
-        teamName: res.data.team_name,
-        logo: res.data.logo_url,
+      setFormData({
+        username: data.username || '',
+        email: data.email || '',
+        phone_number: data.phone_number || '',
+        profile_picture: null,
       });
-      setLoading(false);
+
+      setPreviewImage(data.profile_picture || '');
     } catch (error) {
-      console.error('Error fetching team:', error);
+      toast.error('Failed to load profile.');
+      console.error('Failed to load profile:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -61,80 +54,91 @@ const Settings = () => {
   };
 
   const handleFileChange = (e) => {
-    const { files } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      profile_photo: files[0],
-    }));
+    const file = e.target.files[0];
+    if (file) {
+      setFormData((prev) => ({
+        ...prev,
+        profile_picture: file,
+      }));
+      setPreviewImage(URL.createObjectURL(file));
+    }
   };
 
   const handleUpdate = async () => {
-    const { name, email, phone, profile_photo } = formData;
-
-    // Create FormData to send the profile photo
     const updatedData = new FormData();
-    updatedData.append('name', name);
-    updatedData.append('email', email);
-    updatedData.append('phone', phone);
-    if (profile_photo) {
-      updatedData.append('profile_photo', profile_photo);
+    updatedData.append('username', formData.username);
+    updatedData.append('email', formData.email);
+    updatedData.append('phone_number', formData.phone_number || '');
+
+    if (formData.profile_picture) {
+      updatedData.append('profile_picture', formData.profile_picture);
     }
 
+    setUpdating(true);
     try {
-      await axios.put('http://localhost:8000/api/user/update/', updatedData, {
+      await api.put('/profile/', updatedData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
-      alert('Profile updated successfully!');
+      toast.success('Profile updated successfully!');
     } catch (err) {
-      alert(err.response?.data?.error || 'Update failed');
+      console.error(err);
+      toast.error(err.response?.data?.error || 'Update failed');
+    } finally {
+      setUpdating(false);
     }
   };
 
   const handleDelete = async () => {
     if (window.confirm('Are you sure you want to delete your account?')) {
       try {
-        await axios.delete('http://localhost:8000/api/user/delete/');
-        alert('Account deleted!');
+        await api.delete('/profile/');
+        toast.success('Account deleted!');
+        navigate('/login');
       } catch (err) {
         console.error(err);
+        toast.error('Failed to delete account');
       }
     }
   };
+
+  if (loading) return <div className="loading-spinner">Loading...</div>;
 
   return (
     <DashboardHeader>
       <Sidebar>
         <div className="settings-container">
           <div className="settings-header">
-            <img className="team-logo" src={Logo} alt="Team Logo" />
-            <h2 className="team-name">FAST XI</h2>
+            <h2 className="team-name">Team Settings</h2>
           </div>
 
           <div className="settings-form">
             <h4>Edit Profile</h4>
-            <label>Name</label>
+
+            <label>Username *</label>
             <input
               className="form-input"
-              name="name"
-              value={formData.name}
+              name="username"
+              value={formData.username}
               onChange={handleChange}
+              required
             />
 
-            <label>Email</label>
+            <label>Email *</label>
             <input
               className="form-input"
               name="email"
               value={formData.email}
               onChange={handleChange}
+              required
             />
 
             <label>Phone Number</label>
             <input
               className="form-input"
-              name="phone"
-              value={formData.phone}
+              name="phone_number"
+              value={formData.phone_number}
               onChange={handleChange}
             />
 
@@ -143,11 +147,23 @@ const Settings = () => {
               type="file"
               className="form-input"
               onChange={handleFileChange}
+              accept="image/*"
             />
 
+            {previewImage && (
+              <div className="image-preview">
+                <p>Preview:</p>
+                <img src={previewImage} alt="Preview" className="preview-img" />
+              </div>
+            )}
+
             <div className="btn-group">
-              <button className="btn save-btn" onClick={handleUpdate}>
-                Save Changes
+              <button className="btn save-btn" onClick={handleUpdate} disabled={updating}>
+                {updating ? (
+                  <div className="spinner-border spinner-border-sm text-light" role="status"></div>
+                ) : (
+                  'Save Changes'
+                )}
               </button>
               <button className="btn delete-btn" onClick={handleDelete}>
                 Delete Account

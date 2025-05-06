@@ -3,6 +3,7 @@ import './matchSetup.css';
 import api from '../../utils/api'
 import DashboardHeader from '../../components/DashboardHeader/DashboardHeader';
 import Sidebar from '../../components/Sidebar/Siderbar';
+import { toast } from 'react-toastify';
 
 const MatchSetup = () => {
   const [formData, setFormData] = useState({
@@ -18,6 +19,8 @@ const MatchSetup = () => {
   const [cities, setCities] = useState([]);
   const [locations, setLocations] = useState([]);
   const [formats, setFormats] = useState([]);
+  const [loading, setLoading] = useState(false);
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -50,15 +53,35 @@ const MatchSetup = () => {
     }));
   };
 
+  const initialFormData = {
+    date: "",
+    from_time: "",
+    to_time: "",
+    team_name: "",
+    city_id: "",
+    location_id: "",
+    format_id: ""
+  };
+
   const handleSubmit = async () => {
+    setLoading(true);
     try {
       await api.post('/matchsetups/', formData);
-      alert('Match created successfully!');
+      toast.success('Match created successfully!');
+
+      // Clear form after success
+      setFormData(initialFormData);
     } catch (error) {
       console.error('Error creating match:', error.response?.data || error.message);
-      alert('Failed to create match.');
+      const errorMsg = error.response?.data?.detail || 'Failed to create match.';
+      toast.error(errorMsg);
+    } finally {
+      setLoading(false);
     }
   };
+
+
+
 
   return (
     <DashboardHeader>
@@ -118,7 +141,14 @@ const MatchSetup = () => {
             </div>
 
             <div className="submit">
-              <button className="submit-btn" onClick={handleSubmit}>Submit</button>
+              <button className="submit-btn" onClick={handleSubmit} disabled={loading}>
+                {loading ? (
+                  <div className="spinner-border spinner-border-sm text-light" role="status"></div>
+                ) : (
+                  'Submit'
+                )}
+              </button>
+
             </div>
           </div>
         </div>

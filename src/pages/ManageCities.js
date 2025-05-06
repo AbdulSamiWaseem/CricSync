@@ -1,43 +1,80 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form, Table } from 'react-bootstrap';
+import api from '../utils/api'; // Adjust the path if necessary
 
 const ManageCities = () => {
   const [cities, setCities] = useState([]);
   const [show, setShow] = useState(false);
   const [cityInput, setCityInput] = useState('');
   const [editIndex, setEditIndex] = useState(null);
+  const [editCityId, setEditCityId] = useState(null);
+  
+  useEffect(() => {
+    fetchCities();
+  }, []);
+
+  const fetchCities = async () => {
+    try {
+      const response = await api.get('/cities/');
+      setCities(response.data);
+    } catch (error) {
+      console.error("Error fetching cities", error);
+    }
+  };
 
   const handleClose = () => {
     setShow(false);
     setCityInput('');
     setEditIndex(null);
+    setEditCityId(null);
   };
 
   const handleShow = () => {
     setShow(true);
   };
 
-  const handleSave = () => {
-    if (editIndex !== null) {
-      const updated = [...cities];
-      updated[editIndex] = cityInput;
-      setCities(updated);
+  const handleSave = async () => {
+    if (editCityId !== null) {
+      // Edit city
+      try {
+        await api.put(`/cities/${editCityId}/`, { name: cityInput });
+        fetchCities(); // Re-fetch cities after update
+      } catch (error) {
+        console.error("Error updating city", error);
+      }
     } else {
-      setCities([...cities, cityInput]);
+      // Add new city
+      try {
+        await api.post('/cities/', { name: cityInput });
+        fetchCities(); // Re-fetch cities after adding
+      } catch (error) {
+        console.error("Error adding city", error);
+      }
     }
     handleClose();
   };
 
-  const handleEdit = (index) => {
-    setCityInput(cities[index]);
-    setEditIndex(index);
+  const handleEdit = (cityId, cityName) => {
+    setCityInput(cityName);
+    setEditCityId(cityId);
     handleShow();
   };
 
-  const handleDelete = (index) => {
-    const updated = cities.filter((_, i) => i !== index);
-    setCities(updated);
+  const handleDelete = async (cityId) => {
+    try {
+      await api.delete(`/cities/${cityId}/`);
+      fetchCities(); // Re-fetch cities after deletion
+    } catch (error) {
+      console.error("Error deleting city", error);
+    }
   };
+
+  // Protect route, check if user is admin
+  const userIsAdmin = localStorage.getItem('role') === 'admin'; // Adjust based on how role is stored
+
+  // if (!userIsAdmin) {
+  //   return <div>You do not have permission to view this page.</div>;
+  // }
 
   return (
     <div className="container mt-5">
@@ -54,12 +91,12 @@ const ManageCities = () => {
           </tr>
         </thead>
         <tbody>
-          {cities.map((city, index) => (
-            <tr key={index}>
-              <td>{city}</td>
+          {cities.map((city) => (
+            <tr key={city.id}>
+              <td>{city.name}</td>
               <td>
-                <Button variant="warning" size="sm" onClick={() => handleEdit(index)}>✏️</Button>{' '}
-                <Button variant="danger" size="sm" onClick={() => handleDelete(index)}>🗑️</Button>
+                <Button variant="warning" size="sm" onClick={() => handleEdit(city.id, city.name)}>✏️</Button>{' '}
+                <Button variant="danger" size="sm" onClick={() => handleDelete(city.id)}>🗑️</Button>
               </td>
             </tr>
           ))}
@@ -69,7 +106,7 @@ const ManageCities = () => {
       {/* Modal */}
       <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
-          <Modal.Title>{editIndex !== null ? 'Edit City' : 'Add City'}</Modal.Title>
+          <Modal.Title>{editCityId !== null ? 'Edit City' : 'Add City'}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form>
@@ -94,4 +131,3 @@ const ManageCities = () => {
 };
 
 export default ManageCities;
-

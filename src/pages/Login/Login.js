@@ -1,19 +1,22 @@
 import React, { useState } from 'react';
+import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import UserAuth from '../../components/UserAuth/UserAuth';
 import { useNavigate } from 'react-router-dom';
 import api from '../../utils/api';
 import { useAuth } from '../../context/AuthContext';
 import './Login.css';
 import { useEffect } from 'react';
-
-
+import { toast } from 'react-toastify';
 
 const Login = () => {
   const navigate = useNavigate();
-  const { login,user } = useAuth();
+  const { login, user } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+
 
   useEffect(() => {
     if (user) {
@@ -22,29 +25,38 @@ const Login = () => {
   }, [user, navigate]);
 
   const handleLogin = async () => {
+    setLoading(true);
+    setErrorMsg('');
     try {
-      const response = await api.post('login/', {
-        email: email,
-        password: password,
-      });
-
+      const response = await api.post('login/', { email, password });
+  
       const { access, refresh } = response.data;
-
       localStorage.setItem('access_token', access);
       localStorage.setItem('refresh_token', refresh);
-
-      login({ accessToken: access });
-
+  
+      const profileRes = await api.get('profile/', {
+        headers: { Authorization: `Bearer ${access}` },
+      });
+  
+      const profile = profileRes.data;
+      localStorage.setItem('profile', JSON.stringify(profile));
+      login({ accessToken: access, profile });
+  
+      toast.success('Login successful!');
       navigate('/dashboard');
     } catch (error) {
-      if (error.response && error.response.data && error.response.data.detail) {
-        setErrorMsg(error.response.data.detail);
+      if (error.response?.data?.detail) {
+        toast.error(error.response.data.detail);
       } else {
-        setErrorMsg('Invalid email or password');
+        toast.error('Invalid email or password');
       }
       console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
+  
+
 
   return (
     <UserAuth>
@@ -53,16 +65,41 @@ const Login = () => {
         <div className='fs-4 fw-semibold ml-1 pb-3'>Login To Your Account</div>
 
         <label className='input_label'>Email</label>
-        <input className='user-input' value={email} onChange={(e) => setEmail(e.target.value)} />
+        <input className='user-input ' value={email} onChange={(e) => setEmail(e.target.value)} />
 
         <label className='input_label'>Password</label>
-        <input className='user-input' type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+        <div className="password-input-container">
+          <input
+            className='user-input password'
+            type={showPassword ? "text" : "password"}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <span
+            className="password-toggle-icon"
+            onClick={() => setShowPassword(!showPassword)}
+          >
+            {showPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
+          </span>
+        </div>
 
         {errorMsg && <div className="text-danger mt-2">{errorMsg}</div>}
 
-        <button style={{ backgroundColor: "transparent", border: "none" }} onClick={() => navigate('/forgot-password')}>Forgot Password?</button>
+        {/* <button style={{ backgroundColor: "transparent", border: "none" }} onClick={() => navigate('/forgot-password')}>Forgot Password?</button> */}
 
-        <button className='btn btn-dark my-3' style={{ width: "100%" }} onClick={handleLogin}>Continue</button>
+        <button
+          className='btn btn-dark my-3'
+          style={{ width: "100%" }}
+          onClick={handleLogin}
+          disabled={loading}
+        >
+          {loading ? (
+            <div className="spinner-border spinner-border-sm text-light" role="status"></div>
+          ) : (
+            "Continue"
+          )}
+        </button>
+
 
         <div className="or-container">
           <span className="line"></span>
@@ -70,7 +107,7 @@ const Login = () => {
           <span className="line"></span>
         </div>
 
-        <button className="btn my-2 social-button" style={{ ...socialBtnStyle }}>
+        {/* <button className="btn my-2 social-button" style={{ ...socialBtnStyle }}>
           <img src="/google-logo.png" alt="Google Logo" className="social-logo" />
           Sign up with Google
         </button>
@@ -83,7 +120,7 @@ const Login = () => {
         <button className="btn my-2 social-button" style={{ ...socialBtnStyle }}>
           <img src="/apple-logo.jpg" alt="Apple Logo" className="social-logo" />
           Sign up with Apple
-        </button>
+        </button> */}
 
         <p style={{ marginLeft: "90px", marginTop: "20px" }}>
           New Here?

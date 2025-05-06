@@ -21,6 +21,7 @@
     padding: 5px;
     position: relative;
     width: 100%;
+    outline: none;
 }
 .bg-img-class
 { position: absolute;

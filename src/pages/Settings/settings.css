@@ -71,3 +71,16 @@
   border-radius: 8px;
   cursor: pointer;
 }
+.image-preview {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.preview-img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+}
+

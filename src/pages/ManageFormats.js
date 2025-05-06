@@ -1,50 +1,72 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal, Button, Form, Table } from 'react-bootstrap';
+import api from '../utils/api'; // Adjust the path if needed
 
 const ManageFormats = () => {
   const [formats, setFormats] = useState([]);
   const [show, setShow] = useState(false);
   const [name, setName] = useState('');
   const [overs, setOvers] = useState('');
-  const [editIndex, setEditIndex] = useState(null);
+  const [editFormat, setEditFormat] = useState(null);
+
+  // Fetch all formats from backend
+  const fetchFormats = async () => {
+    try {
+      const res = await api.get('/formats/');
+      setFormats(res.data);
+    } catch (err) {
+      console.error('Error fetching formats:', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchFormats();
+  }, []);
 
   const handleClose = () => {
     setShow(false);
     setName('');
     setOvers('');
-    setEditIndex(null);
+    setEditFormat(null);
   };
 
-  const handleShow = () => {
-    setShow(true);
-  };
+  const handleShow = () => setShow(true);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!name || !overs) return;
-    const newFormat = { name, overs };
 
-    if (editIndex !== null) {
-      const updated = [...formats];
-      updated[editIndex] = newFormat;
-      setFormats(updated);
-    } else {
-      setFormats([...formats, newFormat]);
+    const formatData = {
+      name,
+      overs: parseInt(overs, 10)
+    };
+
+    try {
+      if (editFormat) {
+        await api.put(`/formats/${editFormat.id}/`, formatData);
+      } else {
+        await api.post('/formats/', formatData);
+      }
+      fetchFormats();
+      handleClose();
+    } catch (err) {
+      console.error('Error saving format:', err);
     }
-
-    handleClose();
   };
 
-  const handleEdit = (index) => {
-    const format = formats[index];
+  const handleEdit = (format) => {
     setName(format.name);
     setOvers(format.overs);
-    setEditIndex(index);
+    setEditFormat(format);
     handleShow();
   };
 
-  const handleDelete = (index) => {
-    const updated = formats.filter((_, i) => i !== index);
-    setFormats(updated);
+  const handleDelete = async (formatId) => {
+    try {
+      await api.delete(`/formats/${formatId}/`);
+      fetchFormats();
+    } catch (err) {
+      console.error('Error deleting format:', err);
+    }
   };
 
   return (
@@ -63,13 +85,13 @@ const ManageFormats = () => {
           </tr>
         </thead>
         <tbody>
-          {formats.map((format, index) => (
-            <tr key={index}>
+          {formats.map((format) => (
+            <tr key={format.id}>
               <td>{format.name}</td>
               <td>{format.overs}</td>
               <td>
-                <Button variant="warning" size="sm" onClick={() => handleEdit(index)}>✏️</Button>{' '}
-                <Button variant="danger" size="sm" onClick={() => handleDelete(index)}>🗑️</Button>
+                <Button variant="warning" size="sm" onClick={() => handleEdit(format)}>✏️</Button>{' '}
+                <Button variant="danger" size="sm" onClick={() => handleDelete(format.id)}>🗑️</Button>
               </td>
             </tr>
           ))}
@@ -79,39 +101,27 @@ const ManageFormats = () => {
       {/* Modal */}
       <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
-          <Modal.Title>{editIndex !== null ? 'Edit Format' : 'Add Format'}</Modal.Title>
+          <Modal.Title>{editFormat ? 'Edit Format' : 'Add Format'}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form>
             <Form.Group controlId="formatName">
               <Form.Label>Format Name</Form.Label>
               <Form.Control
-                as="select"
+                type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-              >
-                <option value="">Select format</option>
-                <option value="T10">T10</option>
-                <option value="T20">T20</option>
-                <option value="ODI">ODI</option>
-                <option value="Test">Test</option>
-              </Form.Control>
+                placeholder="Enter Format Name"
+              />
             </Form.Group>
-
             <Form.Group controlId="overs" className="mt-3">
               <Form.Label>Overs</Form.Label>
               <Form.Control
-                as="select"
+                type="number"
                 value={overs}
                 onChange={(e) => setOvers(e.target.value)}
-              >
-                <option value="">Select overs</option>
-                <option value="2">2</option>
-                <option value="5">5</option>
-                <option value="10">10</option>
-                <option value="20">20</option>
-                <option value="50">50</option>
-              </Form.Control>
+                placeholder="Enter Overs"
+              />
             </Form.Group>
           </Form>
         </Modal.Body>

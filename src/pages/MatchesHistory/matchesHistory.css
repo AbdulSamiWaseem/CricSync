@@ -50,6 +50,8 @@
     border-top-left-radius: 20px;
     border-bottom-left-radius: 20px;
     padding: 0 10px;
+    outline: none;
+
 }
 
 .search-section-b>button {
@@ -129,6 +131,7 @@
   
   .match-details div {
     margin-bottom: 6px;
+    padding: 5px;
   }
   
   .match-venue, .match-location, .match-time {
@@ -174,4 +177,4 @@
       font-size: 12px;
     }
   }
-  
+

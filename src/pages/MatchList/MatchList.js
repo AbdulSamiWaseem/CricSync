@@ -4,6 +4,7 @@ import { CiFilter, CiSearch } from "react-icons/ci";
 import DashboardHeader from '../../components/DashboardHeader/DashboardHeader';
 import Sidebar from '../../components/Sidebar/Siderbar';
 import api from '../../utils/api';
+import Loader from '../../components/Loader'; // Assuming you have a loader component
 
 const MatchList = () => {
     const [matches, setMatches] = useState([]);
@@ -23,6 +24,7 @@ const MatchList = () => {
     });
 
     const [entries, setEntries] = useState(10);
+    const [loading, setLoading] = useState(false); // Loading state
 
     useEffect(() => {
         fetchLookups();
@@ -31,6 +33,7 @@ const MatchList = () => {
 
     const fetchLookups = async () => {
         try {
+            setLoading(true); // Start loading
             const [citiesRes, locationsRes, formatsRes] = await Promise.all([
                 api.get('/cities/'),
                 api.get('/locations/'),
@@ -41,11 +44,14 @@ const MatchList = () => {
             setFormats(formatsRes.data);
         } catch (err) {
             console.error("Failed to fetch lookup data", err);
+        } finally {
+            setLoading(false); // End loading
         }
     };
 
     const fetchMatches = async () => {
         try {
+            setLoading(true); // Start loading
             const response = await api.get('/matchsetups/', {
                 params: {
                     ...filters,
@@ -61,8 +67,7 @@ const MatchList = () => {
 
             const profileResponses = await Promise.all(
                 uniqueTeamIds.map(id =>
-                    api.get(`/profile/${id}`).then(res => ({ id, username: res.data.username })).catch(() => ({ id, username: 'Unknown' }))
-                )
+                    api.get(`/profile/${id}`).then(res => ({ id, username: res.data.username })).catch(() => ({ id, username: 'Unknown' })))
             );
 
             const profileMap = {};
@@ -71,9 +76,10 @@ const MatchList = () => {
             });
 
             setProfiles(profileMap);
-
         } catch (err) {
             console.error('Failed to fetch matches or profiles:', err);
+        } finally {
+            setLoading(false); // End loading
         }
     };
 
@@ -173,9 +179,12 @@ const MatchList = () => {
                         </div>
                     </div>
 
+                    {/* Loader */}
+                    {loading && <Loader />} {/* Render loader while loading */}
+
                     {/* Match Cards */}
                     <div className="match-list">
-                        {matches.length === 0 ? (
+                        {matches.length === 0 && !loading ? (
                             <p>No matches found.</p>
                         ) : (
                             matches.map((match) => (

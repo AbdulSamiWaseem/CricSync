@@ -14,11 +14,11 @@ const UpcomingMatchesList = ({ matchData }) => {
             {match.team_1?.name || 'Team A'} vs {match.team_2?.name || 'Team B'}
           </div>
           <div className="match-details">
-            <div className="match-date">
-              {match.date ? new Date(match.date).toLocaleString() : 'Date N/A'}
-            </div>
+            <div className="match-date">{match.date ? new Date(match.date).toLocaleString() : 'Date N/A'}</div>
             <div className="match-venue">{match.venue || 'Venue N/A'}</div>
+            <div className="match-format">{match.format || 'Format N/A'}</div>
           </div>
+
         </div>
       ))}
     </div>
