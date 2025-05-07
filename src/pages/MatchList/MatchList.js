@@ -1,18 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import './matchList.css';
 import { CiFilter, CiSearch } from "react-icons/ci";
 import DashboardHeader from '../../components/DashboardHeader/DashboardHeader';
 import Sidebar from '../../components/Sidebar/Siderbar';
 import api from '../../utils/api';
-import Loader from '../../components/Loader'; // Assuming you have a loader component
+import Loader from '../../components/Loader';
+import { toast } from 'react-toastify';
 
 const MatchList = () => {
     const [matches, setMatches] = useState([]);
     const [cities, setCities] = useState([]);
     const [locations, setLocations] = useState([]);
     const [formats, setFormats] = useState([]);
-    const [profiles, setProfiles] = useState({}); // Store fetched team profiles
-
+    const [profiles, setProfiles] = useState({});
+    const [actionLoading, setActionLoading] = useState({});
+    const [user, setUser] = useState({ id: null, is_staff: false });
+    const [requestedMatches, setRequestedMatches] = useState([]);
+    const [acceptedMatches, setAcceptedMatches] = useState([]);
+    const [matchStatuses, setMatchStatuses] = useState({});
     const [filters, setFilters] = useState({
         city: '',
         area: '',
@@ -24,7 +29,7 @@ const MatchList = () => {
     });
 
     const [entries, setEntries] = useState(10);
-    const [loading, setLoading] = useState(false); // Loading state
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         fetchLookups();
@@ -33,7 +38,7 @@ const MatchList = () => {
 
     const fetchLookups = async () => {
         try {
-            setLoading(true); // Start loading
+            setLoading(true);
             const [citiesRes, locationsRes, formatsRes] = await Promise.all([
                 api.get('/cities/'),
                 api.get('/locations/'),
@@ -45,16 +50,15 @@ const MatchList = () => {
         } catch (err) {
             console.error("Failed to fetch lookup data", err);
         } finally {
-            setLoading(false); // End loading
+            setLoading(false);
         }
     };
 
     const fetchMatches = async () => {
         try {
-            setLoading(true); // Start loading
+            setLoading(true);
             const response = await api.get('/matchsetups/', {
                 params: {
-                    ...filters,
                     limit: entries
                 }
             });
@@ -62,24 +66,29 @@ const MatchList = () => {
             const matchData = response.data;
             setMatches(matchData);
 
-            // Fetch team profile names
             const uniqueTeamIds = [...new Set(matchData.map(m => m.team_name))];
-
             const profileResponses = await Promise.all(
                 uniqueTeamIds.map(id =>
-                    api.get(`/profile/${id}`).then(res => ({ id, username: res.data.username })).catch(() => ({ id, username: 'Unknown' })))
+                    api.get(`/profile/${id}/`).then(res => ({ id, username: res.data.username })).catch(() => ({ id, username: 'Unknown' }))
+                )
             );
-
             const profileMap = {};
             profileResponses.forEach(({ id, username }) => {
                 profileMap[id] = username;
             });
-
             setProfiles(profileMap);
+
+            const userRes = await api.get('/profile/');
+            setUser({ id: userRes.data.id, is_staff: userRes.data.is_staff });
+
+            const reqRes = await api.get('/progress/');
+            setRequestedMatches(reqRes.data.requested_match_ids || []);
+            setAcceptedMatches(reqRes.data.accepted_match_ids || []);
+            setMatchStatuses(reqRes.data.user_status_map || {});
         } catch (err) {
-            console.error('Failed to fetch matches or profiles:', err);
+            console.error('Failed to fetch matches or related data:', err);
         } finally {
-            setLoading(false); // End loading
+            setLoading(false);
         }
     };
 
@@ -92,16 +101,63 @@ const MatchList = () => {
     };
 
     const handleApplyFilter = () => {
-        fetchMatches();
+        fetchMatches(); // still fetches fresh data, then local filter applies
     };
 
     const handleEntriesChange = (e) => {
         setEntries(e.target.value);
-        fetchMatches(); // update match list when entries per page changes
+        fetchMatches();
     };
 
-    const handleRequestMatch = (matchId) => {
-        alert(`Requested match with ID: ${matchId}`);
+    const handleRequestMatch = async (matchId) => {
+        if (!window.confirm("Are you sure you want to request this match?")) return;
+
+        setActionLoading(prev => ({ ...prev, [matchId]: true }));
+        try {
+            await api.post('/progress/', {
+                match: matchId,
+                requested_by: user.id,
+            });
+            toast.success('Match requested successfully!');
+            fetchMatches();
+        } catch (error) {
+            toast.error('Failed to request match.');
+            console.error(error);
+        } finally {
+            setActionLoading(prev => ({ ...prev, [matchId]: false }));
+        }
+    };
+
+    const handleAccept = async (matchId) => {
+        if (!window.confirm("Do you want to accept this match?")) return;
+
+        setActionLoading(prev => ({ ...prev, [matchId]: true }));
+        try {
+            await api.post(`/progress/accept/`, { match_id: matchId });
+            toast.success('Match accepted successfully!');
+            fetchMatches();
+        } catch (error) {
+            toast.error('Failed to accept match.');
+            console.error(error);
+        } finally {
+            setActionLoading(prev => ({ ...prev, [matchId]: false }));
+        }
+    };
+
+    const handleDelete = async (matchId) => {
+        if (!window.confirm("Are you sure you want to delete this match?")) return;
+
+        setActionLoading(prev => ({ ...prev, [matchId]: true }));
+        try {
+            await api.delete(`/matchsetups/${matchId}/`);
+            toast.success('Match deleted successfully!');
+            fetchMatches();
+        } catch (error) {
+            toast.error('Failed to delete match.');
+            console.error(error);
+        } finally {
+            setActionLoading(prev => ({ ...prev, [matchId]: false }));
+        }
     };
 
     const getCityName = (id) => {
@@ -122,6 +178,30 @@ const MatchList = () => {
     const getTeamName = (id) => {
         return profiles?.[id] || 'Unknown';
     };
+
+    const handleEdit = (match) => {
+        alert(`Editing match ${match.id}`);
+    };
+
+    const filteredMatches = useMemo(() => {
+        return matches.filter(match => {
+            const city = getCityName(match.city_id).toLowerCase();
+            const location = getLocationName(match.location_id).toLowerCase();
+            const format = getFormatName(match.format_id).toLowerCase();
+            const team = getTeamName(match.team_name).toLowerCase();
+            const searchTerm = filters.search.toLowerCase();
+
+            return (
+                (!filters.city || String(match.city_id) === filters.city) &&
+                (!filters.area || String(match.location_id) === filters.area) &&
+                (!filters.date || match.date === filters.date) &&
+                (!filters.time || match.from_time === filters.time || match.to_time === filters.time) &&
+                (!filters.match_type || match.match_type === filters.match_type) &&
+                (!filters.format || String(match.format_id) === filters.format) &&
+                (!searchTerm || city.includes(searchTerm) || location.includes(searchTerm) || format.includes(searchTerm) || team.includes(searchTerm))
+            );
+        });
+    }, [matches, filters]);
 
     return (
         <DashboardHeader>
@@ -144,11 +224,7 @@ const MatchList = () => {
                         </select>
                         <input type="date" name="date" onChange={handleChange} />
                         <input type="time" name="time" onChange={handleChange} />
-                        <select name="match_type" onChange={handleChange}>
-                            <option value="">Match Type</option>
-                            <option value="Friendly">Friendly</option>
-                            <option value="Tournament">Tournament</option>
-                        </select>
+                        
                         <select name="format" onChange={handleChange}>
                             <option value="">Format</option>
                             {formats.map(format => (
@@ -179,15 +255,13 @@ const MatchList = () => {
                         </div>
                     </div>
 
-                    {/* Loader */}
-                    {loading && <Loader />} {/* Render loader while loading */}
+                    {loading && <Loader />}
 
-                    {/* Match Cards */}
                     <div className="match-list">
-                        {matches.length === 0 && !loading ? (
-                            <p>No matches found.</p>
+                        {filteredMatches.length === 0 && !loading ? (
+                            <p className='no-matches'>No matches found.</p>
                         ) : (
-                            matches.map((match) => (
+                            filteredMatches.map((match) => (
                                 <div className="match-card" key={match.id}>
                                     <div className="match-card-header">
                                         <span className="match-format">{getFormatName(match.format_id)}</span>
@@ -204,9 +278,57 @@ const MatchList = () => {
                                     </div>
 
                                     <div className="match-request-btn">
-                                        <button onClick={() => handleRequestMatch(match.id)}>
-                                            Request Match
-                                        </button>
+                                        {match.team_name === user.id && !user.is_staff && (
+                                            <>
+                                                {acceptedMatches.includes(match.id) ? (
+                                                    <span title="Match is currently in progress.">
+                                                        <i className="fa fa-whatsapp" aria-hidden="true"></i>
+                                                        <small>In Progress</small>
+                                                    </span>
+                                                ) : requestedMatches.includes(match.id) ? (
+                                                    <button
+                                                        onClick={() => handleAccept(match.id)}
+                                                        disabled={!!actionLoading[match.id]}
+                                                    >
+                                                        Accept {actionLoading[match.id] && <span className="button-spinner"></span>}
+                                                    </button>
+                                                ) : (
+                                                    <button className="edit-btn" onClick={() => handleEdit(match)}>
+                                                        <i className="material-icons" title="Edit">&#xE254;</i> Edit
+                                                    </button>
+                                                )}
+                                            </>
+                                        )}
+
+                                        {user.is_staff && (
+                                            <button
+                                                onClick={() => handleDelete(match.id)}
+                                                disabled={!!actionLoading[match.id]}
+                                            >
+                                                Delete {actionLoading[match.id] && <span className="button-spinner"></span>}
+                                            </button>
+                                        )}
+
+                                        {match.team_name !== user.id && !user.is_staff && (
+                                            <>
+                                                {!requestedMatches.includes(match.id) ? (
+                                                    <button
+                                                        className="request-btn"
+                                                        onClick={() => handleRequestMatch(match.id)}
+                                                        disabled={!!actionLoading[match.id]}
+                                                    >
+                                                        <i className="material-icons">&#xE163;</i> Request
+                                                        {actionLoading[match.id] && <span className="button-spinner"></span>}
+                                                    </button>
+                                                ) : matchStatuses[match.id] === -1 ? (
+                                                    <span className="badge badge-danger">Rejected</span>
+                                                ) : matchStatuses[match.id] === 2 ? (
+                                                    <span><i className="fa fa-whatsapp"></i><small>In Progress</small></span>
+                                                ) : (
+                                                    <span className="badge badge-warning">Pending</span>
+                                                )}
+                                            </>
+                                        )}
                                     </div>
                                 </div>
                             ))

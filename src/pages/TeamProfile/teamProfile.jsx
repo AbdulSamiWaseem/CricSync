@@ -11,7 +11,7 @@ const TeamProfile = () => {
   const [teamData, setTeamData] = useState({
     id: null,
     name: '',
-    logo: '',
+    profile_picture: '',
     total_matches: 0,
     wins: 0,
     losses: 0,
@@ -23,7 +23,7 @@ const TeamProfile = () => {
   useEffect(() => {
     const fetchTeamStats = async () => {
       try {
-        const profileRes = await api.get(`/profile/${id}`);
+        const profileRes = await api.get(`/profile/${id}/`);
         const teamProfile = profileRes.data;
 
         const [progressRes, matchSetupRes] = await Promise.all([
@@ -80,7 +80,7 @@ const TeamProfile = () => {
         setTeamData({
           id: teamId,
           name: teamProfile.username,
-          logo: teamProfile.profile_picture,
+          profile_picture: teamProfile.profile_picture,
           total_matches: matchHistory.length,
           wins,
           losses,
@@ -102,10 +102,10 @@ const TeamProfile = () => {
           <div className="team-profile-section">
             <div className="team-header">
               <div className="team-name">Team {capitalizeFirstLetter(teamData.name)}</div>
-              <div className="team-logo-wrapper">
+              <div className="team-profile_picture-wrapper">
                 <img
-                  className="team-logo"
-                  src={teamData.logo || "/default-logo.png"}
+                  className="team-profile_picture"
+                  src={`${process.env.REACT_APP_BASE_URL}${teamData.profile_picture}` || "/default-profile_picture.png"}
                   alt={`${teamData.name} Logo`}
                 />
               </div>

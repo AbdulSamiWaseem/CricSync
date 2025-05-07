@@ -4,7 +4,7 @@ import DashboardHeader from '../components/DashboardHeader/DashboardHeader';
 import Sidebar from '../components/Sidebar/Siderbar';
 import api from '../utils/api';
 import { toast } from 'react-toastify';
-import Loader from '../components/Loader'; // Assuming you have a Loader component
+import Loader from '../components/Loader';
 
 const getIcon = (type) => {
   switch (type) {
@@ -39,14 +39,10 @@ const getBorderColor = (type) => {
 
 const determineType = (message) => {
   const msg = message.toLowerCase();
-
-  if (msg.includes('match request') && msg.includes('has sent you')) {
-    return 'match-request';
-  }
+  if (msg.includes('match request') && msg.includes('has sent you')) return 'match-request';
   if (msg.includes('accepted')) return 'match-accepted';
   if (msg.includes('failed')) return 'error';
   if (msg.includes('complete')) return 'success';
-
   return 'info';
 };
 
@@ -58,28 +54,25 @@ const formatTime = (timestamp) => {
 const NotificationPage = () => {
   const [notifications, setNotifications] = useState([]);
   const [userId, setUserId] = useState(null);
-  const [filter, setFilter] = useState('all'); // 'all' | 'unread'
-  const [loading, setLoading] = useState(true); // Loader state
+  const [filter, setFilter] = useState('unread');
+  const [loading, setLoading] = useState(true);
 
+  // Fetch profile to get current user ID
   useEffect(() => {
     api.get('/profile/')
-      .then((res) => {
-        setUserId(res.data.id);
-      })
-      .catch((err) => {
-        console.error('Failed to fetch profile:', err);
-      });
+      .then((res) => setUserId(res.data.id))
+      .catch((err) => console.error('Failed to fetch profile:', err));
   }, []);
 
+  // Fetch notifications once userId is available
   useEffect(() => {
     if (!userId) return;
-
-    setLoading(true); // Show loader before fetching notifications
+    setLoading(true);
 
     api.get('/notifications/')
       .then((res) => {
         const formatted = res.data
-          .filter((n) => n.user_to === userId)
+          .filter((n) => n.user_to?.id === userId)
           .map((n) => ({
             id: n.id,
             matchId: n.match_id,
@@ -89,23 +82,36 @@ const NotificationPage = () => {
             is_read: n.is_read,
           }));
         setNotifications(formatted.reverse());
-        setLoading(false); // Hide loader once data is fetched
+        setLoading(false);
       })
       .catch((err) => {
         console.error('Failed to load notifications:', err);
-        setLoading(false); // Hide loader even in case of error
+        setLoading(false);
       });
   }, [userId]);
 
-  const handleDismiss = (id) => {
-    setNotifications((prev) => prev.filter((n) => n.id !== id));
-  };
+  // Collect unread notifications
+  const unreadNotifications = notifications.filter((n) => !n.is_read);
+
+  // Mark unread as read when user leaves the page
+  useEffect(() => {
+    return () => {
+      if (unreadNotifications.length > 0) {
+        const unreadIds = unreadNotifications.map((n) => n.id);
+        api
+          .post('/notifications/mark-read/', { ids: unreadIds })
+          .catch((err) => console.error('Failed to mark notifications as read:', err));
+      }
+    };
+  }, [unreadNotifications]);
+
+
 
   const handleAccept = (matchId, notifId) => {
     api.post(`/matches/${matchId}/accept/`)
       .then(() => {
         toast.success('Match request accepted!');
-        handleDismiss(notifId);
+        // handleDismiss(notifId); 
       })
       .catch((err) => {
         console.error('Failed to accept match:', err);
@@ -113,17 +119,32 @@ const NotificationPage = () => {
       });
   };
   
+
   const handleReject = (matchId, notifId) => {
     api.post(`/matches/${matchId}/reject/`)
       .then(() => {
         toast.success('Match request rejected.');
-        handleDismiss(notifId);
+        // handleDismiss(notifId); 
       })
       .catch((err) => {
         console.error('Failed to reject match:', err);
         toast.error('Failed to reject match.');
       });
   };
+  
+  const handleDismiss = (id) => {
+    api
+      .delete(`/notifications/${id}/`)
+      .then(() => {
+        setNotifications((prev) => prev.filter((n) => n.id !== id));
+        toast.success('Notification dismissed');
+      })
+      .catch((err) => {
+        console.error('Failed to delete notification:', err);
+        toast.error('Failed to dismiss notification.');
+      });
+  };
+  
 
   return (
     <DashboardHeader>
@@ -152,7 +173,7 @@ const NotificationPage = () => {
 
           {/* Filter Buttons */}
           <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
-            {['all', 'unread'].map((f) => (
+            {['unread', 'all'].map((f) => (
               <button
                 key={f}
                 onClick={() => setFilter(f)}
@@ -171,17 +192,13 @@ const NotificationPage = () => {
             ))}
           </div>
 
-          {loading ? (  // Show loader while loading data
+          {loading ? (
             <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem' }}>
-              <Loader /> {/* You can replace this with your loader component */}
+              <Loader />
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              {notifications.filter((n) => {
-                if (filter === 'all') return true;
-                if (filter === 'unread') return !n.is_read;
-                return true;
-              }).length === 0 ? (
+              {notifications.filter((n) => (filter === 'all' ? true : !n.is_read)).length === 0 ? (
                 <div
                   style={{
                     textAlign: 'center',
@@ -198,11 +215,7 @@ const NotificationPage = () => {
                 </div>
               ) : (
                 notifications
-                  .filter((n) => {
-                    if (filter === 'all') return true;
-                    if (filter === 'unread') return !n.is_read;
-                    return true;
-                  })
+                  .filter((n) => (filter === 'all' ? true : !n.is_read))
                   .map((notification) => (
                     <div
                       key={notification.id}

@@ -163,4 +163,10 @@
   color: #9c8500;
 }
 
-
+.team-profile_picture{
+  width: 90px;
+  height: 90px;
+  margin-right: 10px;
+  border-radius: 10%;
+  border: 2px solid #cccccc;
+}

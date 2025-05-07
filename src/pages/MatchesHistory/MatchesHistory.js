@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './matchesHistory.css';
-import { CiFilter, CiSearch } from "react-icons/ci";
+import { CiSearch } from "react-icons/ci";
 import DashboardHeader from '../../components/DashboardHeader/DashboardHeader';
 import Sidebar from '../../components/Sidebar/Siderbar';
 import api from '../../utils/api';
@@ -14,35 +14,50 @@ const MatchesHistory = () => {
     const [matchResult, setMatchResult] = useState('');
     const [totalMatches, setTotalMatches] = useState(0);
     const [loading, setLoading] = useState(true); // Loading state
+    const [formats, setFormats] = useState([]); // State for formats
+
+    useEffect(() => {
+        const fetchFormats = async () => {
+            try {
+                const formatsRes = await api.get('formats/');
+                setFormats(formatsRes.data); // Store formats in state
+            } catch (error) {
+                console.error('Error fetching formats:', error);
+            }
+        };
+
+        fetchFormats();
+    }, []);
 
     useEffect(() => {
         const fetchMatchHistory = async () => {
             try {
                 setLoading(true); // Start loading
-                const userId = parseInt(localStorage.getItem("userId"));
+                const storedProfile = localStorage.getItem("profile");
+                const user = JSON.parse(storedProfile);
+                const userId = user.id;
 
-                const [progressRes, matchSetupsRes, formatsRes, citiesRes] = await Promise.all([
+                const [progressRes, matchSetupsRes, citiesRes] = await Promise.all([
                     api.get('progress/', {
                         params: {
                             search,
-                            filter,
+                            filter,  // Send the filter value to backend
                             result: matchResult,
                             page_size: entries,
                         },
                     }),
                     api.get('matchsetups/'),
-                    api.get('formats/'),
                     api.get('cities/'), // Assuming you have an endpoint for cities
                 ]);
 
                 const progressData = progressRes.data;
                 const matchSetups = matchSetupsRes.data;
-                const formats = formatsRes.data;
                 const cities = citiesRes.data;
 
-                // Create maps for format and city (venue)
-                const formatMap = Object.fromEntries(formats.map(f => [f.id, f.name]));
+                // Create maps for city (venue)
                 const cityMap = Object.fromEntries(cities.map(c => [c.id, c.name]));
+                // Create a map for formats for easy lookup
+                const formatMap = Object.fromEntries(formats.map(f => [f.id, f.name]));
 
                 // Completed matches only
                 const completedMatches = progressData
@@ -55,7 +70,8 @@ const MatchesHistory = () => {
 
                         return {
                             id: match.id,
-                            format: formatMap[setup.format_id] || 'Unknown',
+                            formatId: setup.format_id || 'Unknown',
+                            format: formatMap[setup.format_id] || 'Unknown', // Show the format name
                             venue: cityMap[setup.city_id] || 'Unknown', // Map city_id to venue name
                             location: cityMap[setup.location_id] || 'Unknown', // Using location_id if needed
                             time: setup.from_time || 'Unknown', // Set time to from_time
@@ -82,9 +98,11 @@ const MatchesHistory = () => {
                     opponent: opponentMap[match.opponent] || 'Unknown'
                 }));
 
-                // Apply search filter
+                // Apply search and filter
                 const filteredMatches = finalMatches.filter(match =>
-                    match.opponent.toLowerCase().includes(search.toLowerCase())
+                    match.opponent.toLowerCase().includes(search.toLowerCase()) &&
+                    (filter ? match.format === filter : true) && // Apply format filter by name
+                    (matchResult ? match.result.toLowerCase() === matchResult.toLowerCase() : true) // Apply match result filter
                 );
 
                 setMatches(filteredMatches);
@@ -97,7 +115,7 @@ const MatchesHistory = () => {
         };
 
         fetchMatchHistory();
-    }, [search, filter, matchResult, entries]);
+    }, [search, filter, matchResult, entries, formats]); // Added formats to dependencies
 
     const handleSearchChange = (e) => {
         setSearch(e.target.value);
@@ -107,9 +125,7 @@ const MatchesHistory = () => {
         setFilter(e.target.value);
     };
 
-    const handleEntriesChange = (e) => {
-        setEntries(Number(e.target.value));
-    };
+    
 
     const handleMatchResultChange = (e) => {
         setMatchResult(e.target.value);
@@ -129,20 +145,14 @@ const MatchesHistory = () => {
                                 Apply Filter
                                 <select onChange={handleFilterChange}>
                                     <option value="">All Formats</option>
-                                    <option value="T10">T10</option>
-                                    <option value="T20">T20</option>
-                                    <option value="ODI">ODI</option>
-                                    <option value="TEST">TEST</option>
+                                    {formats.map(format => (
+                                        <option key={format.id} value={format.name}>
+                                            {format.name} ({format.overs} overs)
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
-                            <div>
-                                Show Entries
-                                <select onChange={handleEntriesChange}>
-                                    <option value="10">10</option>
-                                    <option value="20">20</option>
-                                    <option value="50">50</option>
-                                </select>
-                            </div>
+                            
                             <div>
                                 Match Result
                                 <select onChange={handleMatchResultChange}>
@@ -171,7 +181,7 @@ const MatchesHistory = () => {
                                 matches.map((match) => (
                                     <div className="match-item" key={match.id}>
                                         <div className="match-header">
-                                            <span className="match-format">{match.format}</span>
+                                            <span className="match-format">{match.format}</span> {/* Show format name */}
                                             <span className={`match-result ${match.result.toLowerCase()}`}>{match.result}</span>
                                         </div>
                                         <div className="match-details">
@@ -186,18 +196,12 @@ const MatchesHistory = () => {
                                     </div>
                                 ))
                             ) : (
-                                <p>No completed match history available.</p>
+                                <p className='no-matches'>No completed match history available.</p>
                             )}
                         </div>
                     )}
 
-                    {totalMatches > entries && (
-                        <div className="pagination-controls">
-                            <button onClick={() => handlePageChange(10)}>Show 10</button>
-                            <button onClick={() => handlePageChange(20)}>Show 20</button>
-                            <button onClick={() => handlePageChange(50)}>Show 50</button>
-                        </div>
-                    )}
+                    
                 </div>
             </Sidebar>
         </DashboardHeader>
