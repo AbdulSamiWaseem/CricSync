@@ -121,7 +121,7 @@ const SignUp = () => {
                     <span className="line"></span>
                 </div>
 
-                <p style={{ marginLeft: "50px", marginTop: "10px" }}>
+                <p style={{ marginLeft: "50px", marginTop: "10px" }} className='AlreadyAccount'>
                     Already have an account?
                     <button style={{ backgroundColor: "transparent", border: "none", marginLeft: "2px", textDecoration: "underline" }} className='fw-semibold' onClick={() => navigate('/login')}>LOGIN HERE</button>
                 </p>

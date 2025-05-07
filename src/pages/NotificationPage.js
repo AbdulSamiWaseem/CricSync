@@ -211,7 +211,7 @@ const NotificationPage = () => {
                   }}
                 >
                   <FaInfoCircle size={20} color="#3B82F6" style={{ marginBottom: '0.5rem' }} />
-                  <p style={{ margin: 0 }}>No notifications in this category.</p>
+                  <p style={{ margin: 0 }} className='no-matches'>No notifications in this category.</p>
                 </div>
               ) : (
                 notifications
@@ -239,7 +239,7 @@ const NotificationPage = () => {
                         <span style={{ fontSize: '12px', color: '#666' }}>{notification.time}</span>
                       </div>
 
-                      {notification.type === 'match-request' ? (
+                      {/* {notification.type === 'match-request' ? (
                         <div style={{ display: 'flex', gap: '0.5rem' }}>
                           <button
                             className="btn btn-sm btn-success"
@@ -254,7 +254,7 @@ const NotificationPage = () => {
                             Reject
                           </button>
                         </div>
-                      ) : (
+                      ) : ( */}
                         <button
                           onClick={() => handleDismiss(notification.id)}
                           style={{
@@ -266,7 +266,7 @@ const NotificationPage = () => {
                         >
                           <FaTimesCircle color="#888" size={16} />
                         </button>
-                      )}
+                      {/* )} */}
                     </div>
                   ))
               )}

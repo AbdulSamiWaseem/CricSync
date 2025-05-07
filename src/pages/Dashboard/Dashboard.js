@@ -18,14 +18,24 @@ const Dashboard = () => {
 
   useEffect(() => {
     const fetchDashboardData = async () => {
-      setLoading(true); // Set loading to true when data fetching starts
+      setLoading(true);
       try {
-        const [userRes, progressRes, matchSetupsRes, locationsRes, formatsRes] = await Promise.all([
+        const [
+          userRes,
+          progressRes,
+          matchSetupsRes,
+          locationsRes,
+          formatsRes,
+          citiesRes,
+          usersRes
+        ] = await Promise.all([
           api.get('profile/'),
           api.get('progress/'),
           api.get('matchsetups/'),
           api.get('locations/'),
           api.get('formats/'),
+          api.get('cities/'),
+          api.get('users/'),
         ]);
   
         const userId = userRes.data.id;
@@ -33,8 +43,10 @@ const Dashboard = () => {
         const matchSetups = matchSetupsRes.data;
         const formats = formatsRes.data;
         const locations = locationsRes.data;
+        const cities = citiesRes.data;
+        const users = usersRes.data;
   
-        // Filter accepted matches (status === 2)
+        // Filter accepted matches
         const acceptedMatches = progress.filter(p => p.status === 2);
   
         // Get unique user IDs
@@ -61,7 +73,6 @@ const Dashboard = () => {
         const locationMap = Object.fromEntries(locations.map(l => [l.id, l.name]));
         const formatMap = Object.fromEntries(formats.map(f => [f.id, f.name]));
   
-        // Enrich matches
         const enrichedMatches = acceptedMatches.map(entry => {
           const match = matchSetups.find(m => m.id === entry.match);
           if (!match) return null;
@@ -77,18 +88,17 @@ const Dashboard = () => {
             venue: locationMap[match.location_id] || 'Unknown',
             format: formatMap[match.format_id] || 'Unknown',
           };
-        }).filter(Boolean); // Remove nulls
+        }).filter(Boolean);
   
-        // Sort and limit to latest 10 matches
         const sortedMatches = enrichedMatches.sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 10);
   
-        // Unique team IDs for dashboard stats
-        const teamIds = new Set(enrichedMatches.flatMap(m => [m.team_1.id, m.team_2.id]));
+        // Filter users where is_staff is false
+        const validTeams = users.filter(user => !user.is_staff);
   
         setStats({
           totalVenues: locations.length,
-          totalCities: new Set(locations.map(l => l.city)).size,
-          totalTeams: teamIds.size,
+          totalCities: cities.length,
+          totalTeams: validTeams.length,  // Updated to count only non-staff teams
         });
   
         setUser(userRes.data?.username || '');
@@ -96,12 +106,14 @@ const Dashboard = () => {
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
       } finally {
-        setLoading(false); // Set loading to false when data fetching is complete
+        setLoading(false);
       }
     };
   
     fetchDashboardData();
   }, []);
+  
+  
 
   return (
     <DashboardHeader>

@@ -2,19 +2,22 @@
     background: rgb(33, 33, 33);
     background: linear-gradient(68deg, rgba(33, 33, 33, 0.84) 0%, rgba(66, 66, 66, 0.24) 100%);
     height: 115vh;
-    
+
 }
-.section-1{
+
+.section-1 {
     width: 70%;
     color: white;
 }
-.cards{
+
+.cards {
     background-color: white;
     border-top-left-radius: 15px;
     border-top-right-radius: 15px;
     height: 100%;
 }
-.user-input{
+
+.user-input {
     border: 1px solid #bdbdbd;
     border-radius: 5px;
     color: #bdbdbd;
@@ -23,15 +26,37 @@
     width: 100%;
     outline: none;
 }
-.bg-img-class
-{ position: absolute;
+
+.bg-img-class {
+    position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
     z-index: -1;
-    width:70%;
-    height:100vh;
+    width: 70%;
+    height: 100vh;
     z-index: -1;
 }
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+    .section-1{
+        width: 100% !important;
+    }
+
+    .child {
+        width: 100% !important;
+    }
+    .bg-img-class{
+        width: 100% !important;
+    }
+
+    .userAuth {
+        height: 100%;
+        flex-direction: column !important;
+    }
+}
+
+/* Smaller Mobile Devices (Portrait) */

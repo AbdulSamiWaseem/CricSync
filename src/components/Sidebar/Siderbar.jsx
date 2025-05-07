@@ -9,9 +9,11 @@ import { FaRegCircle } from "react-icons/fa";
 import logo from '../../assets/cricsync.png';
 
 const Sidebar = ({ children }) => {
+  const profile = JSON.parse(localStorage.getItem('profile'));
+  const isStaff = profile?.is_staff;
   return (
     <div style={{ display: "flex", flexDirection: "row" }}>
-      {/* Sidebar - fixed on the left */}
+
       <div
         className="sidebar"
         style={{
@@ -51,9 +53,20 @@ const Sidebar = ({ children }) => {
               <div id="collapseMatches" className="accordion-collapse collapse show">
                 <div className="accordion-body">
                   <Link to="/matches/list" style={{ textDecoration: 'none' }}><li><FaRegCircle /> List</li></Link>
+                  {!isStaff
+                  ?<>
                   <Link to="/matches/upcoming-matches" style={{ textDecoration: 'none' }}><li><FaRegCircle /> Upcoming Matches</li></Link>
                   <Link to="/matches/matches-history" style={{ textDecoration: 'none' }}><li><FaRegCircle /> Matches History</li></Link>
                   <Link to="/matches/match-setup" style={{ textDecoration: 'none' }}><li><FaRegCircle /> Match Setup</li></Link>
+                  </>
+                  : <>
+                   <Link to="/manage-formats" style={{ textDecoration: 'none' }}><li><FaRegCircle /> Manage Formats</li></Link>
+                  <Link to="/manage-cities" style={{ textDecoration: 'none' }}><li><FaRegCircle /> Manage Cities</li></Link>
+                  <Link to="/manage-locations" style={{ textDecoration: 'none' }}><li><FaRegCircle /> Manage Locations</li></Link>
+
+                  </>
+                  }
+                  
                 </div>
               </div>
             </div>

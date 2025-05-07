@@ -14,20 +14,22 @@ const TeamsList = () => {
   useEffect(() => {
     const fetchTeams = async () => {
       try {
-        const response = await api.get('/profile/');
-        const profiles = response.data;
+        const response = await api.get('/users/');
+        const users = response.data;
 
-        // Filter out admin/superuser profiles if needed
-        const teamsData = profiles.map((profile) => ({
-          id: profile.id,
-          name: profile.username,
-          logo_url: profile.profile_picture || '/default-logo.png',
-        }));
+        // Exclude admin/superuser (is_staff === true) and map necessary fields
+        const teamsData = users
+          .filter(user => !user.is_staff)
+          .map(user => ({
+            id: user.id,
+            name: user.username,
+            logo_url: user.profile_picture || '/default-logo.png',
+          }));
 
         setTeams(teamsData);
         setFilteredTeams(teamsData);
       } catch (error) {
-        console.error('Error fetching team profiles:', error);
+        console.error('Error fetching users:', error);
       }
     };
 
@@ -35,7 +37,7 @@ const TeamsList = () => {
   }, []);
 
   useEffect(() => {
-    const filtered = teams.filter((team) =>
+    const filtered = teams.filter(team =>
       team.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilteredTeams(filtered);
@@ -57,6 +59,7 @@ const TeamsList = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="team-search-bar"
+            style={{outline:"none"}}
           />
 
           <div className="teams-container">
@@ -76,7 +79,7 @@ const TeamsList = () => {
                 </div>
               ))
             ) : (
-              <p>No teams found.</p>
+              <p className='no-matches'>No teams found.</p>
             )}
           </div>
         </div>

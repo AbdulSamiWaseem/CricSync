@@ -4,7 +4,7 @@ import { Navigate } from 'react-router-dom';
 const RequireAdmin = ({ children }) => {
   const profile = JSON.parse(localStorage.getItem('profile'));
 
-  if (!profile?.is_admin) {
+  if (!profile?.is_staff) {
     return <Navigate to="/" replace />;
   }
 

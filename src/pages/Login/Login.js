@@ -30,7 +30,7 @@ const Login = () => {
     try {
       const response = await api.post('login/', { email, password });
   
-      const { access, refresh } = response.data;
+      const { access, refresh,user } = response.data;
       localStorage.setItem('access_token', access);
       localStorage.setItem('refresh_token', refresh);
   
@@ -122,7 +122,7 @@ const Login = () => {
           Sign up with Apple
         </button> */}
 
-        <p style={{ marginLeft: "90px", marginTop: "20px" }}>
+        <p style={{ marginLeft: "90px", marginTop: "20px" }} className='newHere'>
           New Here?
           <button style={{ backgroundColor: "transparent", border: "none", marginLeft: "5px", textDecoration: "underline" }} className='fw-semibold' onClick={() => navigate('/signup')}>SIGN UP HERE</button>
         </p>

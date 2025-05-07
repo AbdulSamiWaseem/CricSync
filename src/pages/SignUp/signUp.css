@@ -39,3 +39,8 @@
   border: none;
   outline: none;
 }
+@media (max-width: 768px) {
+  .AlreadyAccount{
+    margin-left: 0;
+  }
+}

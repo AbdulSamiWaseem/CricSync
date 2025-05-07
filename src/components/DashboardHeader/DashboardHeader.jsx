@@ -51,7 +51,7 @@ const DashboardHeader = ({ children }) => {
 
         <div className="profile-section">
           <Link to={`/team/${userData.teamId}`} className="team-info">
-            <img src={userData.teamLogo || Logo} alt="Team Logo" className="team-logo" />
+            <img src={`${process.env.REACT_APP_BASE_URL}${userData.teamLogo}` || Logo} alt="Team Logo" className="team-logo" />
             <span className="team-name">{capitalizeFirstLetter(userData.teamName)}</span>
           </Link>
         </div>

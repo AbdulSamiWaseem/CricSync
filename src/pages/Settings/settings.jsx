@@ -76,7 +76,7 @@ const Settings = () => {
 
     setUpdating(true);
     try {
-      await api.put('/profile/', updatedData, {
+      await api.put('/profile/update/', updatedData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -165,9 +165,9 @@ const Settings = () => {
                   'Save Changes'
                 )}
               </button>
-              <button className="btn delete-btn" onClick={handleDelete}>
+              {/* <button className="btn delete-btn" onClick={handleDelete}>
                 Delete Account
-              </button>
+              </button> */}
             </div>
           </div>
         </div>

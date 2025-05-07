@@ -332,6 +332,7 @@
 .match-request-btn button:hover {
     background-color: #7c38d8;
 }
+
 .button-spinner {
     width: 16px;
     height: 16px;
@@ -342,10 +343,148 @@
     display: inline-block;
     vertical-align: middle;
     margin-left: 6px;
-  }
-  
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-  
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.modal-content {
+    background: #fff;
+    padding: 30px;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    animation: slideUp 0.3s ease-in-out;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-content h2 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    color: #333;
+    text-align: center;
+}
+
+.request-user-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.request-user-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    transition: background-color 0.2s;
+}
+
+.request-user-item:hover {
+    background-color: #f9f9f9;
+}
+
+.request-user-item img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #9747ff;
+}
+
+.request-user-item div {
+    flex: 1;
+    margin-left: 15px;
+}
+
+.request-user-item p {
+    margin: 2px 0;
+    font-size: 14px;
+    color: #444;
+}
+
+.request-user-item p strong {
+    font-size: 16px;
+    color: #333;
+}
+
+.request-user-item button {
+    padding: 8px 16px;
+    background-color: #9747ff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.request-user-item button:hover {
+    background-color: #7e36e8;
+}
+
+.close-modal-btn {
+    margin-top: 20px;
+    background-color: transparent;
+    border: 2px solid #9747ff;
+    color: #9747ff;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.close-modal-btn:hover {
+    background-color: #9747ff;
+    color: white;
+}

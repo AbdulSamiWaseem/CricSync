@@ -1,0 +1,80 @@
+/* Default Styles */
+.start-container {
+    padding: 1% 2%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .start-buttons {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+  }
+  
+  .start-btn {
+    background-color: transparent;
+    border: none;
+    font-size: 18px;
+    padding: 10px 20px;
+    
+  }
+  
+  .start-logo {
+    width: 85%;
+    margin-bottom: 20px;
+  }
+  
+  .start-text {
+    font-size: 24px;
+    text-align: center;
+    position: absolute;
+    bottom: 15px;
+  }
+  
+  /* Mobile Responsive Styles */
+  @media (max-width: 768px) {
+    .start-container {
+      padding: 8% 4%;
+    }
+  
+    .start-buttons {
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+    }
+  
+    .start-btn {
+      width: 100%;
+      font-size: 16px;
+      padding: 12px;
+      background-color: blueviolet;
+      color: white;
+    }
+  
+    .start-logo {
+      width: 110%;
+    }
+  
+    .start-text {
+      font-size: 20px;
+      margin-top: 10px;
+    }
+  }
+  
+  /* Smaller Mobile Devices */
+  @media (max-width: 480px) {
+    .start-text {
+      font-size: 18px;
+    }
+  
+    .start-btn {
+      font-size: 14px;
+      padding: 10px;
+    }
+  }
+  

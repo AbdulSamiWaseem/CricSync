@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './matchSetup.css';
-import api from '../../utils/api'
+import api from '../../utils/api';
 import DashboardHeader from '../../components/DashboardHeader/DashboardHeader';
 import Sidebar from '../../components/Sidebar/Siderbar';
 import { toast } from 'react-toastify';
@@ -21,7 +21,6 @@ const MatchSetup = () => {
   const [formats, setFormats] = useState([]);
   const [loading, setLoading] = useState(false);
 
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -34,10 +33,14 @@ const MatchSetup = () => {
         setCities(cityRes.data);
         setLocations(locationRes.data);
         setFormats(formatRes.data);
-        setFormData(prev => ({
-          ...prev,
-          team_name: userRes.data.id
-        }));
+
+        // Ensure userRes data exists and then set team_name
+        if (userRes && userRes.data && userRes.data.id) {
+          setFormData(prev => ({
+            ...prev,
+            team_name: userRes.data.id
+          }));
+        }
       } catch (err) {
         console.error("Error fetching data:", err);
       }
@@ -69,8 +72,11 @@ const MatchSetup = () => {
       await api.post('/matchsetups/', formData);
       toast.success('Match created successfully!');
 
-      // Clear form after success
-      setFormData(initialFormData);
+      // Clear form after success but preserve team_name
+      setFormData(prev => ({
+        ...initialFormData,
+        team_name: prev.team_name
+      }));
     } catch (error) {
       console.error('Error creating match:', error.response?.data || error.message);
       const errorMsg = error.response?.data?.detail || 'Failed to create match.';
@@ -79,8 +85,6 @@ const MatchSetup = () => {
       setLoading(false);
     }
   };
-
-
 
 
   return (
@@ -92,7 +96,7 @@ const MatchSetup = () => {
               <div className="first-col">
                 <div className="form-group">
                   <label>Select City</label>
-                  <select name="city_id" onChange={handleChange}>
+                  <select name="city_id" onChange={handleChange} value={formData.city_id}>
                     <option value="">Select City</option>
                     {cities.map(city => (
                       <option key={city.id} value={city.id}>{city.name}</option>
@@ -101,14 +105,14 @@ const MatchSetup = () => {
                 </div>
                 <div className="form-group">
                   <label>Date</label>
-                  <input name="date" type="date" onChange={handleChange} />
+                  <input name="date" type="date" onChange={handleChange} value={formData.date}/>
                 </div>
               </div>
 
               <div className="second-col">
                 <div className="form-group">
                   <label>Select Location</label>
-                  <select name="location_id" onChange={handleChange}>
+                  <select name="location_id" onChange={handleChange} value={formData.location_id}>
                     <option value="">Select Location</option>
                     {locations
                       .filter(loc => loc.city_id === formData.city_id) // 🔍 Filter by selected city
@@ -119,7 +123,7 @@ const MatchSetup = () => {
                 </div>
                 <div className="form-group">
                   <label>Start Time</label>
-                  <input name="from_time" type="time" onChange={handleChange} />
+                  <input name="from_time" type="time" onChange={handleChange} value={formData.from_time}/>
                 </div>
               </div>
             </div>
@@ -127,11 +131,11 @@ const MatchSetup = () => {
             <div className="dropdown-wrapper">
               <div className="form-group">
                 <label>Finish Time</label>
-                <input name="to_time" type="time" onChange={handleChange} />
+                <input name="to_time" type="time" onChange={handleChange} value={formData.to_time}/>
               </div>
               <div className="form-group dropdown-1">
                 <label>Select Format</label>
-                <select name="format_id" onChange={handleChange}>
+                <select name="format_id" onChange={handleChange} value={formData.format_id}>
                   <option value="">Select Format</option>
                   {formats.map(format => (
                     <option key={format.id} value={format.id}>{format.name}</option>
@@ -148,7 +152,6 @@ const MatchSetup = () => {
                   'Submit'
                 )}
               </button>
-
             </div>
           </div>
         </div>

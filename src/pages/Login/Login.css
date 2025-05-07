@@ -1,3 +1,4 @@
+/* Default Styles */
 .or-container {
   display: flex;
   align-items: center;
@@ -48,10 +49,93 @@
   padding: 0px 10px;
   width: 100%;
 }
-.password{
-  border:none
+
+.password {
+  border: none;
 }
+
 button[disabled] {
   opacity: 0.7;
   cursor: not-allowed;
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+  .user-input,
+  .password-input-container,
+  .btn {
+    width: 100%;
+    font-size: 14px;
+    padding: 8px;
+  }
+
+  .fs-4 {
+    font-size: 20px;
+    text-align: center;
+  }
+
+  .or-container {
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+  }
+
+  .line {
+    width: 100%;
+    margin: 5px 0;
+  }
+
+  .fs-5 {
+    font-size: 16px;
+    margin: 10px 0;
+  }
+
+  .password-input-container {
+    margin-bottom: 10px;
+  }
+
+  .social-button {
+    font-size: 12px;
+    padding: 8px;
+  }
+
+  .input_label {
+    font-size: 14px;
+  }
+
+  /* For "New Here?" section */
+  p {
+    text-align: center;
+  }
+
+  button[disabled] {
+    opacity: 0.5;
+  }
+  .newHere{
+    margin-left: 0 !important;
+  }
+}
+
+/* Smaller Mobile Devices (Portrait) */
+@media (max-width: 480px) {
+  .fs-4 {
+    font-size: 18px;
+  }
+
+  .input_label {
+    font-size: 12px;
+  }
+
+  .user-input {
+    font-size: 14px;
+  }
+
+  .password-input-container {
+    padding: 0 8px;
+  }
+
+  .social-button {
+    font-size: 12px;
+    padding: 6px;
+  }
 }

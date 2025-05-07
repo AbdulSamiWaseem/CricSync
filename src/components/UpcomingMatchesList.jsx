@@ -3,7 +3,7 @@ import './UpcomingMatchesList.css';
 
 const UpcomingMatchesList = ({ matchData }) => {
   if (!matchData || matchData.length === 0) {
-    return <p>No upcoming matches available.</p>;
+    return <p className='no-matches'>No upcoming matches available.</p>;
   }
 
   return (
