@@ -15,7 +15,7 @@ const TeamProfile = () => {
     total_matches: 0,
     wins: 0,
     losses: 0,
-    ties: 0
+    no_results: 0
   });
 
   const [matchHistory, setMatchHistory] = useState([]);
@@ -47,7 +47,7 @@ const TeamProfile = () => {
           }
         });
 
-        let wins = 0, losses = 0, ties = 0;
+        let wins = 0, losses = 0, no_results = 0;
         const matchHistory = [];
 
         Object.values(latestMatches).forEach(p => {
@@ -58,12 +58,12 @@ const TeamProfile = () => {
           const isFinished = p.status === 2 || p.status === 3;
 
           if (isInvolved && isFinished) {
-            let result = 'Tied';
+            let result = 'No Result';
             if (p.winner === teamId) {
               wins++;
               result = 'Won';
             } else if (p.winner === null) {
-              ties++;
+              no_results++;
             } else {
               losses++;
               result = 'Lost';
@@ -84,7 +84,7 @@ const TeamProfile = () => {
           total_matches: matchHistory.length,
           wins,
           losses,
-          ties
+          no_results
         });
       } catch (err) {
         console.error("Error loading team stats:", err);
@@ -135,9 +135,9 @@ const TeamProfile = () => {
 
               <div className="stat-box">
                 <div className="stat-bar yellow-bar">
-                  <div className="stat-header">Tied</div>
+                  <div className="stat-header">No Result</div>
                 </div>
-                <div className="stat-value yellow-body">{teamData.ties}</div>
+                <div className="stat-value yellow-body">{teamData.no_results}</div>
               </div>
             </div>
 

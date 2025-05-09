@@ -113,7 +113,7 @@ const MyMatches = () => {
       <Sidebar>
         <div className='match-list' style={{ padding: "20px", width: "100%", backgroundColor: "#f0f0f0", height: "100vh" }}>
           <div className='my-match-search-section container'>
-            <div className='search-section-a'>Upcoming Matches</div>
+            <div className='search-section-a no-matches'>Upcoming Matches</div>
             <div className='search-section-b'>
               <input
                 placeholder='Search by team name...'

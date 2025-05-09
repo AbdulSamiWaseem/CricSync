@@ -483,8 +483,70 @@
     margin-left: auto;
     margin-right: auto;
 }
+button > svg{
+    margin-right: 5px !important;
+}
 
 .close-modal-btn:hover {
     background-color: #9747ff;
     color: white;
+}
+@media (max-width: 768px) {
+    .match-filter,
+    .match-search-section {
+        flex-wrap: wrap;
+    }
+
+    .match-filter > select,
+    .match-filter > input,
+    .search-section-b input,
+    .search-section-b button {
+        width: 45%;
+        margin: 5px 0;
+    }
+
+    .search-section-a {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .search-section-a > div {
+        margin-right: 0 !important;
+    }
+
+    .search-section-b {
+        align-items: stretch;
+        width: 100%;
+        margin-top: 0 !important;
+    }
+
+    .apply-filter-btn {
+        justify-content: center;
+        margin-right: 0;
+        margin-top: 10px;
+    }
+
+    .match-card {
+        width: 100%;
+        margin: 0;
+    }
+
+    .match-info {
+        flex-wrap: wrap;
+    }
+
+    
+
+    .request-user-item img {
+        margin-bottom: 10px;
+    }
+
+    
+
+    .modal-content {
+        padding: 20px;
+    }
+    .match-list{
+        margin: 0 !important;
+    }
 }

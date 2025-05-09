@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import './sidebar.css';
 import { Link } from 'react-router-dom';
 import { RxDashboard } from "react-icons/rx";
@@ -7,15 +7,39 @@ import { TbCricket } from "react-icons/tb";
 import { FaPen } from "react-icons/fa";
 import { FaRegCircle } from "react-icons/fa";
 import logo from '../../assets/cricsync.png';
+import { RxHamburgerMenu } from "react-icons/rx";
+ 
 
-const Sidebar = ({ children }) => {
+const Sidebar = ({ children, sidebar, setSideBar }) => {
   const profile = JSON.parse(localStorage.getItem('profile'));
+  console.log(sidebar)
   const isStaff = profile?.is_staff;
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 768) {
+        setSideBar(true);  // Always show sidebar on large screens
+      } else {
+        setSideBar(false); // Hide on smaller screens by default
+      }
+    };
+  
+    // Initial check
+    handleResize();
+  
+    // Add listener
+    window.addEventListener('resize', handleResize);
+  
+    // Cleanup
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+  
   return (
     <div style={{ display: "flex", flexDirection: "row" }}>
 
       <div
-        className="sidebar"
+        className={`sidebar ${sidebar ? 'sidebar-open' : 'sidebar-closed'}`}
         style={{
           position: "fixed",
           top: 0,
@@ -27,7 +51,9 @@ const Sidebar = ({ children }) => {
           zIndex: 1000,
         }}
       >
-        <img src={logo} style={{ width: "100px", objectFit: "contain", paddingLeft: "10px" }} />
+        <RxHamburgerMenu className='ham-burger close-btn' onClick={() => setSideBar(false)} />
+
+        <img src={logo} style={{ width: "100px", objectFit: "contain", paddingLeft: "10px" }} className='cricsync-logo' />
         <ul className="sidebar-menu">
           <Link to="/dashboard">
             <li style={{ backgroundColor: "#9747ff", color: "white", fontWeight: "600", borderRadius: "10px", padding: "10px" }}>
@@ -54,19 +80,19 @@ const Sidebar = ({ children }) => {
                 <div className="accordion-body">
                   <Link to="/matches/list" style={{ textDecoration: 'none' }}><li><FaRegCircle /> List</li></Link>
                   {!isStaff
-                  ?<>
-                  <Link to="/matches/upcoming-matches" style={{ textDecoration: 'none' }}><li><FaRegCircle /> Upcoming Matches</li></Link>
-                  <Link to="/matches/matches-history" style={{ textDecoration: 'none' }}><li><FaRegCircle /> Matches History</li></Link>
-                  <Link to="/matches/match-setup" style={{ textDecoration: 'none' }}><li><FaRegCircle /> Match Setup</li></Link>
-                  </>
-                  : <>
-                   <Link to="/manage-formats" style={{ textDecoration: 'none' }}><li><FaRegCircle /> Manage Formats</li></Link>
-                  <Link to="/manage-cities" style={{ textDecoration: 'none' }}><li><FaRegCircle /> Manage Cities</li></Link>
-                  <Link to="/manage-locations" style={{ textDecoration: 'none' }}><li><FaRegCircle /> Manage Locations</li></Link>
+                    ? <>
+                      <Link to="/matches/upcoming-matches" style={{ textDecoration: 'none' }}><li><FaRegCircle /> Upcoming Matches</li></Link>
+                      <Link to="/matches/matches-history" style={{ textDecoration: 'none' }}><li><FaRegCircle /> Matches History</li></Link>
+                      <Link to="/matches/match-setup" style={{ textDecoration: 'none' }}><li><FaRegCircle /> Match Setup</li></Link>
+                    </>
+                    : <>
+                      <Link to="/manage-formats" style={{ textDecoration: 'none' }}><li><FaRegCircle /> Manage Formats</li></Link>
+                      <Link to="/manage-cities" style={{ textDecoration: 'none' }}><li><FaRegCircle /> Manage Cities</li></Link>
+                      <Link to="/manage-locations" style={{ textDecoration: 'none' }}><li><FaRegCircle /> Manage Locations</li></Link>
 
-                  </>
+                    </>
                   }
-                  
+
                 </div>
               </div>
             </div>
@@ -127,7 +153,7 @@ const Sidebar = ({ children }) => {
       </div>
 
       {/* Main Content Area - pushed to the right of sidebar */}
-      <div style={{ marginLeft: "250px", width: "80%" }}>
+      <div style={{ marginLeft: "250px", width: "80%" }} className='main-container'>
         {children}
       </div>
     </div>

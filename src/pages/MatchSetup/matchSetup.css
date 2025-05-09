@@ -86,8 +86,10 @@ select {
   grid-column: 1 / -1;
   display: flex;
   justify-content: center;
-  margin-top: auto; /* Changed from 20px to auto */
-  padding-top: 20px; /* Added for spacing */
+  margin-top: auto;
+  /* Changed from 20px to auto */
+  padding-top: 20px;
+  /* Added for spacing */
 }
 
 .submit-btn {
@@ -106,4 +108,113 @@ select {
 
 .submit-btn:hover {
   background: #7e3fdc;
+}
+
+/* ------------------- Responsive for Match List / History Section ------------------- */
+@media (max-width: 768px) {
+  .match-setup {
+    height: 100% !important;
+    padding: 0 !important;
+  }
+
+  .match-history-search-section {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 15px;
+  }
+
+  .search-section-a {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .search-section-a>div {
+    margin-right: 0;
+    margin-bottom: 1rem;
+    width: 100%;
+  }
+
+  .search-section-a>div>select {
+    width: 100%;
+    border-radius: 8px;
+    margin: 0;
+  }
+
+  .search-section-b {
+    width: 100%;
+    flex-direction: row;
+    margin-top: 10px;
+  }
+
+  .search-section-b>input {
+    border-radius: 8px 0 0 8px;
+  }
+
+  .search-section-b>button {
+    border-radius: 0 8px 8px 0;
+    padding: 0 15px;
+  }
+
+  .match-item {
+    padding: 10px;
+  }
+
+  .match-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .match-format,
+  .match-result {
+    font-size: 12px;
+    padding: 4px 10px;
+  }
+
+  .match-details div {
+    font-size: 13px;
+  }
+
+  .history-item {
+    font-size: 13px;
+  }
+  .dropdown-1 select {
+    width:100% !important;
+  }
+}
+
+/* ------------------- Responsive for Match Setup Section ------------------- */
+@media (max-width: 768px) {
+  .match-setup-section.container {
+    padding: 20px;
+    margin: 0 !important;
+  }
+
+  .form-container {
+    grid-template-columns: 1fr;
+    /* Stack inputs vertically */
+    gap: 16px;
+  }
+
+  .submit {
+    justify-content: center;
+    margin-top: 20px;
+  }
+
+  .submit-btn {
+    width: 100%;
+    font-size: 14px;
+    height: 50px;
+  }
+
+  label {
+    font-size: 14px;
+  }
+
+  input,
+  select {
+    font-size: 14px;
+    height: 50px;
+    padding: 10px 14px;
+  }
 }

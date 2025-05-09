@@ -64,6 +64,48 @@ li>svg {
 .accordion-body {
   padding: 0 20px;
 }
+
 .sidebar::-webkit-scrollbar {
-  display: none; /* For Chrome, Safari, and Opera */
+  display: none;
+}
+
+.sidebar {
+  transition: transform 0.3s ease-in-out;
+}
+
+.sidebar-closed {
+  transform: translateX(-100%);
+}
+
+.sidebar-open {
+  transform: translateX(0);
+}
+
+
+
+.ham-burger {
+  font-size: 1.75rem;
+  color: #878787;
+  cursor: pointer;
+  margin-top: 20px;
+  margin-left: 10px;
+
+}
+
+
+@media (max-width:768px) {
+  .main-container {
+    width: 100% !important;
+    margin: 0 !important;
+  }
+
+  .cricsync-logo {
+    display: none;
+  }
+}
+
+@media (min-width:500px) {
+  .ham-burger {
+    display: none;
+  }
 }

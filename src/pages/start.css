@@ -50,10 +50,11 @@
   
     .start-btn {
       width: 100%;
-      font-size: 16px;
       padding: 12px;
       background-color: blueviolet;
       color: white;
+      font-size: 16px !important;
+
     }
   
     .start-logo {
@@ -63,6 +64,12 @@
     .start-text {
       font-size: 20px;
       margin-top: 10px;
+    }
+    .start-text {
+      font-size: 24px;
+      text-align: center;
+      position: relative;
+      bottom: 15px;
     }
   }
   

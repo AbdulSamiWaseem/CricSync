@@ -12,7 +12,10 @@ const StatsCard = ({ title, count, icon, color1, color2 }) => {
       boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
       background: `linear-gradient(to right, ${color1}, ${color2})`,
     }} >
-      <div style={{ display: "flex", alignItems: "center" }}>
+      <div style={{
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        width: "100%"
+      }}>
         <div>
           <h5>{title}</h5>
           <p>{count}</p>

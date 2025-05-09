@@ -44,4 +44,34 @@
     border-radius: 8px;
     border: 1px solid #ccc;
   }
+  @media (max-width: 768px) {
+    .teams-container {
+      justify-content: center;
+      align-items: center; /* Center items */
+      gap: 16px;
+    }
+  
+    .team-item {
+      width: 100%; /* Full width on small screens */
+      max-width: 300px;
+      margin: 0 auto;
+      padding: 15px;
+    }
+  
+    .team-logo {
+      width: 60px;
+      height: 60px;
+      margin: 0;
+    }
+  
+    .team-name {
+      font-size: 14px;
+    }
+  
+    .team-search-bar {
+      width: 100%;
+      font-size: 14px;
+      padding: 8px;
+    }
+  }
   

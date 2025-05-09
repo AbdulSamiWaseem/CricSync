@@ -1,48 +1,72 @@
 .matches-list {
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    width: 100%;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 100%;
+}
+
+.match-item {
+  background-color: #fff;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.match-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+}
+
+.match-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #374957;
+}
+
+.team-name {
+  color: #007bff;
+  /* Blue color for team names */
+}
+
+.match-details {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  margin-top: 10px;
+  color: #888;
+}
+
+.match-date {
+  font-weight: bold;
+}
+
+.match-details div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.match-venue {
+  font-style: italic;
+}
+
+@media (max-width:500px) {
+  .matches-list {
+    padding: 0 !important;
   }
-  
-  .match-item {
-    background-color: #fff;
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    cursor: pointer;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
-  
-  .match-item:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
-  }
-  
+
   .match-title {
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: #374957;
+    font-size: 1rem !important;
+
   }
-  
-  .team-name {
-    color: #007bff;  /* Blue color for team names */
-  }
-  
   .match-details {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.9rem;
-    margin-top: 10px;
-    color: #888;
+    font-size: 0.8rem !important;
   }
-  
-  .match-date {
-    font-weight: bold;
+  .match-item{
+    padding-top: 10px !important;
+    padding-right: 10px !important;
   }
-  
-  .match-venue {
-    font-style: italic;
-  }
-  
+}

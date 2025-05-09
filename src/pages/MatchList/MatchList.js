@@ -6,6 +6,8 @@ import Sidebar from '../../components/Sidebar/Siderbar';
 import api from '../../utils/api';
 import Loader from '../../components/Loader';
 import { toast } from 'react-toastify';
+import { IoSend } from "react-icons/io5";
+import { MdOutlineCallReceived } from "react-icons/md";
 
 const MatchList = () => {
     const [matches, setMatches] = useState([]);
@@ -18,7 +20,6 @@ const MatchList = () => {
     const [showModal, setShowModal] = useState(false);
     const [selectedMatchRequests, setSelectedMatchRequests] = useState([]);
     const [selectedMatchId, setSelectedMatchId] = useState(null);
-
 
     const [filters, setFilters] = useState({
         city: '',
@@ -51,6 +52,7 @@ const MatchList = () => {
             setLoading(false);
         }
     };
+
     const acceptMatchRequest = async (requestId) => {
         setActionLoading(prev => ({ ...prev, [requestId]: true }));
         try {
@@ -87,11 +89,33 @@ const MatchList = () => {
     const fetchMatches = async () => {
         setLoading(true);
         try {
-            const response = await api.get('/matchsetups/', { params: { limit: entries } });
-            const matchData = response.data;
-            setMatches(matchData);
-
-            const uniqueTeamIds = [...new Set(matchData.map(m => m.team_name))];
+            // Step 1: Fetch matches
+            const matchResponse = await api.get('/matchsetups/', { params: { limit: entries } });
+            const matchData = matchResponse.data;
+    
+            // Step 2: Fetch progress data
+            const progressResponse = await api.get('/progress/');
+            const progressData = progressResponse.data;
+    
+            // Step 3: Build a set of match IDs with status 2 or 3
+            const excludedMatchIds = new Set(
+                progressData
+                    .filter(p => p.status === 2 || p.status === 3)
+                    .map(p => p.match)
+            );
+    
+            // Step 4: Filter matches
+            const filteredMatches = matchData.filter(m => !excludedMatchIds.has(m.id));
+    
+            // Step 5: Sort latest first
+            const sorted = filteredMatches.sort((a, b) => 
+                new Date(b.date + ' ' + b.from_time) - new Date(a.date + ' ' + a.from_time)
+            );
+    
+            setMatches(sorted);
+    
+            // Step 6: Load unique team profile usernames
+            const uniqueTeamIds = [...new Set(filteredMatches.map(m => m.team_name))];
             const profileResponses = await Promise.all(
                 uniqueTeamIds.map(id =>
                     api.get(`/profile/${id}/`).then(res => ({ id, username: res.data.username })).catch(() => ({ id, username: 'Unknown' }))
@@ -102,23 +126,27 @@ const MatchList = () => {
                 profileMap[id] = username;
             });
             setProfiles(profileMap);
-
+    
+            // Step 7: Set user data
             const userRes = await api.get('/profile/');
             setUser({ id: userRes.data.id, is_staff: userRes.data.is_staff });
-
-            const reqRes = await api.get('/progress/');
-
-
-
+    
         } catch (err) {
-            console.error('Failed to fetch matches or related data:', err);
+            console.error('Error fetching matches or progress data:', err);
         } finally {
             setLoading(false);
         }
     };
+    
+    
 
     const handleChange = (e) => {
-        setFilters(prev => ({ ...prev, [e.target.name]: e.target.value }));
+        const { name, value } = e.target;
+        if (name === 'city') {
+            setFilters(prev => ({ ...prev, city: value, area: '' }));
+        } else {
+            setFilters(prev => ({ ...prev, [name]: value }));
+        }
     };
 
     const handleSearchChange = (e) => {
@@ -126,11 +154,6 @@ const MatchList = () => {
     };
 
     const handleApplyFilter = () => {
-        fetchMatches();
-    };
-
-    const handleEntriesChange = (e) => {
-        setEntries(e.target.value);
         fetchMatches();
     };
 
@@ -143,26 +166,23 @@ const MatchList = () => {
             toast.success('Match requested successfully!');
             fetchMatches();
         } catch (error) {
-            toast.error('Failed to request match.');
+            toast.error('You already requested to that match.');
             console.error(error);
         } finally {
             setActionLoading(prev => ({ ...prev, [matchId]: false }));
         }
     };
 
-    
-
     const handleDelete = async (matchId) => {
         if (!window.confirm("Are you sure you want to delete this match?")) return;
 
         setActionLoading(prev => ({ ...prev, [matchId]: true }));
         try {
-            
             await api.delete(`/match/${matchId}/delete/`);
             toast.success('Match deleted successfully!');
             fetchMatches();
         } catch (error) {
-            toast.error('This Match is Scheduled you cannot delete that!.');
+            toast.error('This Match is Scheduled you cannot delete that!');
             console.error(error);
         } finally {
             setActionLoading(prev => ({ ...prev, [matchId]: false }));
@@ -188,9 +208,10 @@ const MatchList = () => {
         return profiles?.[id] || 'Unknown';
     };
 
-    const handleEdit = (match) => {
-        alert(`Editing match ${match.id}`);
-    };
+    const filteredLocations = useMemo(() => {
+        if (!filters.city) return locations;
+        return locations.filter(loc => Number(loc.city_id) === Number(filters.city));
+    }, [filters.city, locations]);
 
     const filteredMatches = useMemo(() => {
         return matches.filter(match => {
@@ -216,7 +237,6 @@ const MatchList = () => {
         <DashboardHeader>
             <Sidebar>
                 <div className='match-list-page' style={{ padding: "20px", width: "100%", backgroundColor: "#f0f0f0", minHeight: "100vh" }}>
-
                     {/* Filters */}
                     <div className='match-filter container'>
                         <select name="city" onChange={handleChange}>
@@ -227,7 +247,7 @@ const MatchList = () => {
                         </select>
                         <select name="area" onChange={handleChange}>
                             <option value="">Area</option>
-                            {locations.map(loc => (
+                            {filteredLocations.map(loc => (
                                 <option key={loc.id} value={loc.id}>{loc.name}</option>
                             ))}
                         </select>
@@ -242,21 +262,12 @@ const MatchList = () => {
                         </select>
                     </div>
 
-                    {/* Search and Entries */}
+                    {/* Search */}
                     <div className='match-search-section container'>
                         <div className='search-section-a'>
                             <button className='apply-filter-btn' onClick={handleApplyFilter}>
                                 Apply Filter <CiFilter style={{ marginLeft: '5px' }} />
                             </button>
-                            {/* <div className='show-entries'>
-                                Show Entries
-                                <select value={entries} onChange={handleEntriesChange}>
-                                    <option value="5">5</option>
-                                    <option value="10">10</option>
-                                    <option value="20">20</option>
-                                    <option value="50">50</option>
-                                </select>
-                            </div> */}
                         </div>
                         <div className='search-section-b'>
                             <input placeholder='Search' value={filters.search} onChange={handleSearchChange} />
@@ -287,81 +298,64 @@ const MatchList = () => {
                                     </div>
 
                                     <div className="match-request-btn">
+                                        {/* Accept button only shown for matches created by the logged-in user */}
                                         {match.team_name === user.id && !user.is_staff && (
-                                            <>
-
-                                                <button onClick={() => openAcceptModal(match.id)} disabled={!!actionLoading[match.id]}>
-                                                    Accept {actionLoading[match.id] && <span className="button-spinner"></span>}
-                                                </button>
-
-
-                                            </>
+                                            <button onClick={() => openAcceptModal(match.id)} disabled={!!actionLoading[match.id]}>
+                                                <MdOutlineCallReceived/>
+                                                Accept {actionLoading[match.id] && <span className="button-spinner"></span>}
+                                            </button>
                                         )}
 
                                         {user.is_staff && (
-                                            <button
-                                                onClick={() => handleDelete(match.id)}
-                                                disabled={!!actionLoading[match.id]}
-                                            >
+                                            <button onClick={() => handleDelete(match.id)} disabled={!!actionLoading[match.id]}>
                                                 Delete {actionLoading[match.id] && <span className="button-spinner"></span>}
                                             </button>
                                         )}
 
                                         {match.team_name !== user.id && !user.is_staff && (
-                                            <>
-
-                                                <button
-                                                    className="request-btn"
-                                                    onClick={() => handleRequestMatch(match.id)}
-                                                    disabled={!!actionLoading[match.id]}
-                                                >
-                                                    <i className="material-icons">&#xE163;</i> Request
-                                                    {actionLoading[match.id] && <span className="button-spinner"></span>}
-                                                </button>
-
-                                            </>
+                                            <button className="request-btn" onClick={() => handleRequestMatch(match.id)} disabled={!!actionLoading[match.id]}>
+                                                <IoSend/> Request
+                                                {actionLoading[match.id] && <span className="button-spinner"></span>}
+                                            </button>
                                         )}
                                     </div>
                                 </div>
                             ))
                         )}
                     </div>
-                </div>
-                {showModal && (
-                    <div className="modal-overlay">
-                        <div className="modal-content">
-                            <h2>Select a Team to Accept</h2>
-                            {selectedMatchRequests.length === 0 ? (
-                                <p>No requests found for this match.</p>
-                            ) : (
-                                <ul className="request-user-list">
-                                    {selectedMatchRequests.map(req => (
-                                        <li key={req.id} className="request-user-item">
-                                            <img src={req.requested_by.profile_picture} alt={req.requested_by.username} />
-                                            <div>
-                                                <p><strong>{req.requested_by.username}</strong></p>
-                                                <p>{req.requested_by.email}</p>
-                                                <p>{req.requested_by.phone_number}</p>
-                                            </div>
-                                            <button
-                                                onClick={() => acceptMatchRequest(req.id)}
-                                                disabled={!!actionLoading[req.id]}
-                                            >
-                                                Accept {actionLoading[req.id] && <span className="button-spinner"></span>}
-                                            </button>
-                                        </li>
-                                    ))}
-                                </ul>
-                            )}
-                            <button className="close-modal-btn" onClick={() => setShowModal(false)}>Close</button>
-                        </div>
-                    </div>
-                )}
 
+                    {showModal && (
+                        <div className="modal-overlay">
+                            <div className="modal-content">
+                                <h2>Select a Team to Accept</h2>
+                                {selectedMatchRequests.length === 0 ? (
+                                    <p>No requests found for this match.</p>
+                                ) : (
+                                    <ul className="request-user-list">
+                                        {selectedMatchRequests.map(req => (
+                                            <li key={req.id} className="request-user-item">
+                                                <img src={`${process.env.REACT_APP_BASE_URL}${req.requested_by.profile_picture}`} alt={req.requested_by.username} />
+                                                <div>
+                                                    <p><strong>{req.requested_by.username}</strong></p>
+                                                    <p>{req.requested_by.email}</p>
+                                                    <p>{req.requested_by.phone_number}</p>
+                                                </div>
+                                                <button onClick={() => acceptMatchRequest(req.id)} disabled={!!actionLoading[req.id]}>
+                                                    <MdOutlineCallReceived/>
+                                                    Accept {actionLoading[req.id] && <span className="button-spinner"></span>}
+                                                </button>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                                <button className="close-modal-btn" onClick={() => setShowModal(false)}>Close</button>
+                            </div>
+                        </div>
+                    )}
+                </div>
             </Sidebar>
         </DashboardHeader>
     );
-
 };
 
 export default MatchList;

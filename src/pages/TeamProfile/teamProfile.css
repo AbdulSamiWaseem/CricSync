@@ -170,3 +170,78 @@
   border-radius: 10%;
   border: 2px solid #cccccc;
 }
+
+@media (max-width: 768px) {
+  .team-profile {
+    padding: 10px;
+    height: auto;
+    overflow: auto;
+  }
+
+  .team-profile-section {
+    padding: 20px 10px;
+    border-radius: 10px;
+  }
+
+  .team-header {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .team-name {
+    font-size: 20px;
+    text-align: left;
+  }
+
+  
+
+  .follow-btn-wrapper {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .follow-btn {
+    width: 100%;
+    padding: 8px;
+    font-size: 14px;
+  }
+
+  .team-stats {
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
+  }
+
+  .stat-box {
+    width: 100%;
+    min-width: unset;
+  }
+
+  .stat-value {
+    font-size: 20px;
+    padding: 15px 0;
+  }
+
+  .stat-bar {
+    font-size: 14px;
+    height: 35px;
+  }
+
+  .history-section {
+    padding: 0 5px;
+  }
+
+  .team-profile_picture {
+    
+    margin-bottom: 10px;
+  }
+
+  .history-header {
+    font-size: 16px;
+    padding: 8px;
+  }
+
+  .history-item {
+    font-size: 14px;
+  }
+}
