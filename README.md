@@ -37,7 +37,7 @@ A full-stack web application built with **Django** and **React.js** that enables
 ## 🚀 Getting Started
 
 ### Prerequisites
-- Python 3.x
+- Python
 - Node.js & npm
 
 ### Backend Setup
